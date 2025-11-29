@@ -1,8 +1,9 @@
-[gd_scene load_steps=29 format=3 uid="uid://cpa7ynkewjg0c"]
+[gd_scene load_steps=30 format=3 uid="uid://cpa7ynkewjg0c"]
 
 [ext_resource type="Script" uid="uid://d2va8dq0p3ppn" path="res://scripts/enemy.gd" id="1_p1c7d"]
 [ext_resource type="PackedScene" uid="uid://bsug6in4ddcdk" path="res://scene/projectile.tscn" id="2_5xvwy"]
 [ext_resource type="Texture2D" uid="uid://e11mpqqrxp86" path="res://assets/Knight_A.png" id="3_qsx0e"]
+[ext_resource type="Texture2D" uid="uid://bmtew3clc87o5" path="res://assets/light.png" id="4_5xvwy"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1d40f"]
 radius = 5.0
@@ -191,10 +192,13 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="EnemyCharacter1" type="CharacterBody2D" node_paths=PackedStringArray("player")]
+[node name="EnemyCharacter1" type="CharacterBody2D"]
 script = ExtResource("1_p1c7d")
-player = NodePath("")
 projectile_scene = ExtResource("2_5xvwy")
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+position = Vector2(0, 19)
+texture = ExtResource("4_5xvwy")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CapsuleShape2D_1d40f")
