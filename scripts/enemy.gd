@@ -195,11 +195,7 @@ func _handle_spawn_projectile(delta: float) -> void:
 	var proj_node := proj as Node2D
 	if proj_node:
 		proj_node.global_position = spawn_pos
-
-		# Flip or set direction on projectile if it supports it
-		# (optional; depends on your Projectile script)
-		if "direction" in proj_node:
-			proj_node.direction = Vector2(dir_sign, 0.0)
+		proj_node.set_direction(Vector2(dir_sign, 0.0))
 
 	get_tree().current_scene.add_child(proj)
 

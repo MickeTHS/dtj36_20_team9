@@ -39,6 +39,7 @@ var background_fill_chance: float = 0.6           # how full the background is
 
 var rng := RandomNumberGenerator.new()
 
+var last_ground_heights: Array = []
 
 func _ready() -> void:
 	rng.randomize()
@@ -55,10 +56,12 @@ func generate_level() -> void:
 		background_tilemap.clear()
 
 	var ground_heights := _generate_ground_profile()
+	last_ground_heights = ground_heights
 	_paint_ground(ground_heights)
 	_add_rescue_platforms(ground_heights)
 	_paint_background(ground_heights)
 	_place_exit_door(ground_heights)
+
 
 
 func _generate_ground_profile() -> Array:
@@ -217,3 +220,12 @@ func _place_exit_door(heights: Array) -> void:
 
 	door_area.global_position = cell_global
 	door_area.visible = true
+
+func get_ground_y_at(x: int) -> int:
+	if x < 0 or x >= last_ground_heights.size():
+		return -1
+
+	if last_ground_heights[x] == null:
+		return -1
+
+	return int(last_ground_heights[x])

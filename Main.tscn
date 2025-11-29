@@ -1,17 +1,19 @@
-[gd_scene load_steps=46 format=4 uid="uid://8n6fki16mjou"]
+[gd_scene load_steps=48 format=4 uid="uid://8n6fki16mjou"]
 
 [ext_resource type="Script" uid="uid://bohix0qc05fvw" path="res://scripts/game.gd" id="1_03owx"]
 [ext_resource type="Script" uid="uid://cnfxw346yj4px" path="res://scripts/level.gd" id="2_20pc6"]
 [ext_resource type="Texture2D" uid="uid://kwfymdekkvmf" path="res://assets/example-tileset.png" id="2_wkp8b"]
 [ext_resource type="Script" uid="uid://cytpe7mta0mh3" path="res://scripts/background_tilemap.gd" id="3_20pc6"]
+[ext_resource type="PackedScene" uid="uid://cpa7ynkewjg0c" path="res://scene/enemy_character_1.tscn" id="3_fpfj3"]
 [ext_resource type="Script" uid="uid://0twq1tgvxej6" path="res://scripts/player_character.gd" id="4_5vvyt"]
 [ext_resource type="Texture2D" uid="uid://dpej88mbekbpj" path="res://assets/decent_tileset1.png" id="4_20pc6"]
+[ext_resource type="PackedScene" uid="uid://biybxy57ig8rd" path="res://scene/enemy_character_2.tscn" id="4_sc1dx"]
 [ext_resource type="Texture2D" uid="uid://e11mpqqrxp86" path="res://assets/Knight_A.png" id="5_c6i3y"]
+[ext_resource type="PackedScene" uid="uid://dwuxubri6yjhy" path="res://scene/enemy_character_3.tscn" id="5_kjvhd"]
+[ext_resource type="PackedScene" uid="uid://bjl8jwjes6y1n" path="res://scene/enemy_character_4.tscn" id="6_5tuhn"]
 [ext_resource type="Script" uid="uid://bjgyiqulxmsun" path="res://scripts/platform_generator.gd" id="6_c2ibq"]
 [ext_resource type="Script" uid="uid://d27q2f5vleaw4" path="res://scripts/ui.gd" id="7_j4qnp"]
-[ext_resource type="Script" uid="uid://d2va8dq0p3ppn" path="res://scripts/enemy.gd" id="8_5vvyt"]
 [ext_resource type="Texture2D" uid="uid://072r7kge6fyu" path="res://assets/button_restart.png" id="8_fpfj3"]
-[ext_resource type="PackedScene" uid="uid://bsug6in4ddcdk" path="res://scene/projectile.tscn" id="9_c6i3y"]
 [ext_resource type="Texture2D" uid="uid://brbyjuhxev8me" path="res://assets/hearts.png" id="9_sc1dx"]
 [ext_resource type="Script" uid="uid://d3rvh2ngw53mc" path="res://scripts/ui_heart.gd" id="14_c2ibq"]
 
@@ -267,6 +269,7 @@ level_root = NodePath(".")
 ui = NodePath("../UILayer")
 red_step_per_level = 0.25
 desaturate_step_per_level = 0.25
+enemy_types = Array[PackedScene]([ExtResource("3_fpfj3"), ExtResource("4_sc1dx"), ExtResource("5_kjvhd"), ExtResource("6_5tuhn")])
 
 [node name="TileMapLayerBg" type="TileMapLayer" parent="Level" node_paths=PackedStringArray("target_camera")]
 texture_filter = 1
@@ -312,23 +315,6 @@ zoom = Vector2(4, 4)
 one_shot = true
 
 [node name="IFrameTimer" type="Timer" parent="PlayerCharacter"]
-
-[node name="EnemyCharacter1" type="CharacterBody2D" parent="." node_paths=PackedStringArray("player")]
-position = Vector2(140, -29)
-script = ExtResource("8_5vvyt")
-player = NodePath("../PlayerCharacter")
-projectile_scene = ExtResource("9_c6i3y")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyCharacter1"]
-shape = SubResource("CapsuleShape2D_1d40f")
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="EnemyCharacter1"]
-position = Vector2(0, 7)
-sprite_frames = SubResource("SpriteFrames_k8iq5")
-animation = &"attack"
-
-[node name="AttackTimer" type="Timer" parent="EnemyCharacter1"]
-one_shot = true
 
 [node name="LevelGenerator" type="Node2D" parent="." node_paths=PackedStringArray("door_area", "ground_tilemap", "background_tilemap")]
 script = ExtResource("6_c2ibq")
@@ -397,5 +383,4 @@ camera_attributes = SubResource("CameraAttributesPractical_0omci")
 [connection signal="body_entered" from="Level/DoorArea2D" to="Level" method="_on_door_area_2d_body_entered"]
 [connection signal="timeout" from="PlayerCharacter/AttackTimer" to="PlayerCharacter" method="_on_attack_timer_timeout"]
 [connection signal="timeout" from="PlayerCharacter/IFrameTimer" to="PlayerCharacter" method="_on_i_frame_timer_timeout"]
-[connection signal="timeout" from="EnemyCharacter1/AttackTimer" to="EnemyCharacter1" method="_on_attack_timer_timeout"]
 [connection signal="pressed" from="UILayer/RestartButton" to="." method="_on_restart_button_pressed"]

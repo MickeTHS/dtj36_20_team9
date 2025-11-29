@@ -6,9 +6,10 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5vvyt"]
 size = Vector2(4, 14)
 
-[node name="Projectile" type="Area2D"]
+[node name="Projectile" type="Area2D" node_paths=PackedStringArray("sprite")]
 rotation = 1.5707964
 script = ExtResource("1_u6xv6")
+sprite = NodePath("ProjectileSprite")
 
 [node name="ProjectileSprite" type="Sprite2D" parent="."]
 texture = ExtResource("2_c0tm2")

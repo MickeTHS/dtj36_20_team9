@@ -1,15 +1,25 @@
 class_name Projectile
 extends Area2D
 
+@export var sprite : Sprite2D
 @export var speed: float = 120.0
 @export var lifetime: float = 4.0
 
 var direction: Vector2 = Vector2.LEFT
 var _life_timer: float = 0.0
 
+func set_direction(dir: Vector2) -> void:
+	direction = dir.normalized()
+	
+	if direction.x < 0:
+		sprite.scale.y = 1
+	else:
+		sprite.scale.y = -1
+	
+
 func _ready() -> void:
 	_life_timer = lifetime
-
+	
 
 func _process(delta: float) -> void:
 	# Move in the chosen direction
@@ -24,10 +34,6 @@ func _process(delta: float) -> void:
 # Optional if you want collision behavior
 func _on_area_entered(area: Area2D) -> void:
 	pass
-	# Example:
-	# if area is PlayerCharacter:
-	#     area.take_damage(1)
-	#queue_free()
 
 
 func _on_body_entered(body: Node2D) -> void:
