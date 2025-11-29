@@ -2,7 +2,30 @@ class_name UI extends Node
 
 @export var restart_button : TextureButton
 @export var level_label : Label
+@export var heart0 : UIHeart
+@export var heart1 : UIHeart
+@export var heart2 : UIHeart
 
+
+func set_health(health: int) -> void:
+	heart0.set_point(0)
+	heart1.set_point(0)
+	heart2.set_point(0)
+	
+	if health >= 2:
+		heart0.set_point(2)
+	if health >= 4:
+		heart1.set_point(2)
+	if health == 6:
+		heart2.set_point(2)
+		
+	if health == 1:
+		heart0.set_point(1)
+	if health == 3:
+		heart1.set_point(1)
+	if health == 5:
+		heart2.set_point(1)
+	
 func set_level(level: int) -> void:
 	level_label.text = "Level " + str(level)
 

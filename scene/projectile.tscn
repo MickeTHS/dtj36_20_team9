@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://bsug6in4ddcdk"]
+
+[ext_resource type="Script" uid="uid://dtf7sk2udkrh4" path="res://scripts/projectile.gd" id="1_u6xv6"]
+[ext_resource type="Texture2D" uid="uid://dpej88mbekbpj" path="res://assets/decent_tileset1.png" id="2_c0tm2"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5vvyt"]
+size = Vector2(4, 14)
+
+[node name="Projectile" type="Area2D"]
+rotation = 1.5707964
+script = ExtResource("1_u6xv6")
+
+[node name="ProjectileSprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_c0tm2")
+region_enabled = true
+region_rect = Rect2(16.339975, 48.66191, 8.075592, 14.718422)
+
+[node name="ProjectileCollisionShape" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_5vvyt")
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

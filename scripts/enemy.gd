@@ -3,6 +3,10 @@ extends CharacterBody2D
 
 @export var player: PlayerCharacter
 
+@export var has_projectile: bool = true
+@export var has_sword: bool = false
+@export var has_magic: bool = false
+
 @export var move_to_player: bool = false
 @export var keep_distance_player: bool = false
 
@@ -13,6 +17,11 @@ extends CharacterBody2D
 @export var preferred_distance_tolerance: float = 10.0
 @export var attack_range: float = 25.0
 @export var attack_duration: float = 0.5
+
+@export var projectile_scene: PackedScene
+@export var min_projectile_interval: float = 1.0
+@export var max_projectile_interval: float = 3.0
+@export var projectile_spawn_offset: Vector2 = Vector2(8, -8)
 
 const JUMP_VELOCITY := -150.0
 
@@ -28,6 +37,7 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 var _last_x: float = 0.0
 var _stuck_timer: float = 0.0
+var _projectile_timer: float = 0.0
 
 @onready var anim_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var attack_timer: Timer = $AttackTimer
@@ -68,6 +78,15 @@ func _ready() -> void:
 		attack_timer.one_shot = true
 
 	_last_x = global_position.x
+	_reset_projectile_timer()
+	
+func _reset_projectile_timer() -> void:
+	if min_projectile_interval <= 0.0 and max_projectile_interval <= 0.0:
+		_projectile_timer = 0.0
+	else:
+		var min_t : float = max(min_projectile_interval, 0.1)
+		var max_t : float = max(max_projectile_interval, min_t)
+		_projectile_timer = randf_range(min_t, max_t)
 
 
 func _physics_process(delta: float) -> void:
@@ -92,6 +111,9 @@ func _physics_process(delta: float) -> void:
 
 	# Simple attack check
 	_check_attack()
+	
+	# Projectile shooting
+	_handle_spawn_projectile(delta)
 
 	# Move the character
 	move_and_slide()
@@ -139,6 +161,49 @@ func _get_ai_direction() -> float:
 
 	return dir
 
+
+func _handle_spawn_projectile(delta: float) -> void:
+	if not has_projectile:
+		return
+	if projectile_scene == null:
+		return
+	if player == null:
+		return
+
+	_projectile_timer -= delta
+	if _projectile_timer > 0.0:
+		return
+
+	# Only shoot if roughly facing the player horizontally
+	var dx: float = player.global_position.x - global_position.x
+	var dir_sign: float = 0.0
+	if dx > 0.0:
+		dir_sign = 1.0
+	elif dx < 0.0:
+		dir_sign = -1.0
+
+	if dir_sign == 0.0:
+		_reset_projectile_timer()
+		return
+
+	# Spawn projectile slightly in front of the enemy
+	var spawn_pos: Vector2 = global_position
+	spawn_pos.x += projectile_spawn_offset.x * dir_sign
+	spawn_pos.y += projectile_spawn_offset.y
+
+	var proj := projectile_scene.instantiate()
+	var proj_node := proj as Node2D
+	if proj_node:
+		proj_node.global_position = spawn_pos
+
+		# Flip or set direction on projectile if it supports it
+		# (optional; depends on your Projectile script)
+		if "direction" in proj_node:
+			proj_node.direction = Vector2(dir_sign, 0.0)
+
+	get_tree().current_scene.add_child(proj)
+
+	_reset_projectile_timer()
 
 func _handle_stuck_and_jump(delta: float, direction: float) -> void:
 	# Only care about being stuck if trying to move on the floor and not attacking

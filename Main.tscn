@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=4 uid="uid://8n6fki16mjou"]
+[gd_scene load_steps=46 format=4 uid="uid://8n6fki16mjou"]
 
 [ext_resource type="Script" uid="uid://bohix0qc05fvw" path="res://scripts/game.gd" id="1_03owx"]
 [ext_resource type="Script" uid="uid://cnfxw346yj4px" path="res://scripts/level.gd" id="2_20pc6"]
@@ -11,7 +11,9 @@
 [ext_resource type="Script" uid="uid://d27q2f5vleaw4" path="res://scripts/ui.gd" id="7_j4qnp"]
 [ext_resource type="Script" uid="uid://d2va8dq0p3ppn" path="res://scripts/enemy.gd" id="8_5vvyt"]
 [ext_resource type="Texture2D" uid="uid://072r7kge6fyu" path="res://assets/button_restart.png" id="8_fpfj3"]
+[ext_resource type="PackedScene" uid="uid://bsug6in4ddcdk" path="res://scene/projectile.tscn" id="9_c6i3y"]
 [ext_resource type="Texture2D" uid="uid://brbyjuhxev8me" path="res://assets/hearts.png" id="9_sc1dx"]
+[ext_resource type="Script" uid="uid://d3rvh2ngw53mc" path="res://scripts/ui_heart.gd" id="14_c2ibq"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_1d40f"]
 
@@ -289,9 +291,10 @@ texture_filter = 1
 tile_map_data = PackedByteArray("AAAAAAIAAAAAAAAAAAABAAIAAAAAAAAAAAACAAIAAAAAAAAAAAADAAIAAAAAAAAAAAAEAAIAAAAAAAAAAAAFAAIAAAAAAAAAAAAGAAIAAAAAAAAAAAAHAAIAAAAAAAAAAAAIAAIAAAAAAAAAAAAJAAIAAAAAAAAAAAAKAAIAAAAAAAAAAAALAAIAAAAAAAAAAAD//wIAAAAAAAAAAAAMAAIAAAAAAAAAAAANAAIAAAAAAAAAAAAOAAIAAAAAAAAAAAAPAAIAAAAAAAAAAAAQAAIAAAAAAAAAAAA=")
 tile_set = SubResource("TileSet_1d40f")
 
-[node name="PlayerCharacter" type="CharacterBody2D" parent="."]
+[node name="PlayerCharacter" type="CharacterBody2D" parent="." node_paths=PackedStringArray("ui")]
 position = Vector2(107, -29)
 script = ExtResource("4_5vvyt")
+ui = NodePath("../UILayer")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerCharacter"]
 shape = SubResource("CapsuleShape2D_1d40f")
@@ -312,6 +315,7 @@ one_shot = true
 position = Vector2(140, -29)
 script = ExtResource("8_5vvyt")
 player = NodePath("../PlayerCharacter")
+projectile_scene = ExtResource("9_c6i3y")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyCharacter1"]
 shape = SubResource("CapsuleShape2D_1d40f")
@@ -333,10 +337,13 @@ level_width = 25
 gap_chance = 0.08
 background_tiles = Array[Vector2i]([Vector2i(1, 1)])
 
-[node name="UILayer" type="CanvasLayer" parent="." node_paths=PackedStringArray("restart_button", "level_label")]
+[node name="UILayer" type="CanvasLayer" parent="." node_paths=PackedStringArray("restart_button", "level_label", "heart0", "heart1", "heart2")]
 script = ExtResource("7_j4qnp")
 restart_button = NodePath("RestartButton")
 level_label = NodePath("LevelLabel")
+heart0 = NodePath("Lifebar/Heart0")
+heart1 = NodePath("Lifebar/Heart1")
+heart2 = NodePath("Lifebar/Heart2")
 
 [node name="RestartButton" type="TextureButton" parent="UILayer"]
 offset_left = 10.0
@@ -354,22 +361,25 @@ texture_normal = ExtResource("8_fpfj3")
 position = Vector2(83, 112)
 scale = Vector2(4, 4)
 texture = ExtResource("9_sc1dx")
-region_enabled = true
+hframes = 5
 region_rect = Rect2(0, 0, 16, 16)
+script = ExtResource("14_c2ibq")
 
 [node name="Heart1" type="Sprite2D" parent="UILayer/Lifebar"]
-position = Vector2(144, 112)
+position = Vector2(143, 112)
 scale = Vector2(4, 4)
 texture = ExtResource("9_sc1dx")
-region_enabled = true
+hframes = 5
 region_rect = Rect2(0, 0, 16, 16)
+script = ExtResource("14_c2ibq")
 
 [node name="Heart2" type="Sprite2D" parent="UILayer/Lifebar"]
-position = Vector2(204, 112)
+position = Vector2(203, 112)
 scale = Vector2(4, 4)
 texture = ExtResource("9_sc1dx")
-region_enabled = true
+hframes = 5
 region_rect = Rect2(0, 0, 16, 16)
+script = ExtResource("14_c2ibq")
 
 [node name="LevelLabel" type="Label" parent="UILayer"]
 offset_left = 267.0

@@ -1,17 +1,25 @@
 class_name PlayerCharacter extends CharacterBody2D
 
+@export var ui : UI
+
 const SPEED := 90.0
 const JUMP_VELOCITY := -250.0
 
 var just_attacked = false
 var attacking = false
+var health = 6
 
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 @onready var anim_sprite: AnimatedSprite2D = $AnimatedSprite2D
 
+func add_health(change: int) -> void:
+	health += change
+	ui.set_health(health)
+
 func _ready() -> void:
 	anim_sprite.play("idle")
+	ui.set_health(6)
 
 func _physics_process(delta: float) -> void:
 	# Apply gravity
