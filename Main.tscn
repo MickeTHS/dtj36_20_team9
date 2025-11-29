@@ -323,6 +323,10 @@ ground_tilemap = NodePath("../Level/TileMapLayer")
 background_tilemap = NodePath("../Level/TileMapLayerBg")
 level_width = 25
 gap_chance = 0.08
+surface_tiles = Array[Vector2i]([Vector2i(1, 0), Vector2i(0, 1)])
+soil_tiles = Array[Vector2i]([Vector2i(1, 1)])
+rare_soil_tiles = Array[Vector2i]([Vector2i(2, 2)])
+rare_soil_chance = 0.02
 background_tiles = Array[Vector2i]([Vector2i(1, 1)])
 
 [node name="UILayer" type="CanvasLayer" parent="." node_paths=PackedStringArray("restart_button", "level_label", "heart0", "heart1", "heart2")]
