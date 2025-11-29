@@ -311,6 +311,8 @@ zoom = Vector2(4, 4)
 [node name="AttackTimer" type="Timer" parent="PlayerCharacter"]
 one_shot = true
 
+[node name="IFrameTimer" type="Timer" parent="PlayerCharacter"]
+
 [node name="EnemyCharacter1" type="CharacterBody2D" parent="." node_paths=PackedStringArray("player")]
 position = Vector2(140, -29)
 script = ExtResource("8_5vvyt")
@@ -394,5 +396,6 @@ camera_attributes = SubResource("CameraAttributesPractical_0omci")
 
 [connection signal="body_entered" from="Level/DoorArea2D" to="Level" method="_on_door_area_2d_body_entered"]
 [connection signal="timeout" from="PlayerCharacter/AttackTimer" to="PlayerCharacter" method="_on_attack_timer_timeout"]
+[connection signal="timeout" from="PlayerCharacter/IFrameTimer" to="PlayerCharacter" method="_on_i_frame_timer_timeout"]
 [connection signal="timeout" from="EnemyCharacter1/AttackTimer" to="EnemyCharacter1" method="_on_attack_timer_timeout"]
 [connection signal="pressed" from="UILayer/RestartButton" to="." method="_on_restart_button_pressed"]

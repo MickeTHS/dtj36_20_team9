@@ -33,7 +33,5 @@ func _on_area_entered(area: Area2D) -> void:
 func _on_body_entered(body: Node2D) -> void:
 	if body.name == "PlayerCharacter":
 		queue_free()
-	# Example:
-	# if body is PlayerCharacter:
-	#     body.take_damage(1)
-	
+		if body is PlayerCharacter:
+			body.add_health(-1)
