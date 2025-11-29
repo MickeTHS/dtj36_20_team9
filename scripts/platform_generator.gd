@@ -1,5 +1,7 @@
 class_name PlatformGenerator extends Node2D
 
+@export var door_area: Area2D   # The Area2D door instance to move
+
 @export var ground_tilemap: TileMapLayer
 @export var background_tilemap: TileMapLayer
 
@@ -26,8 +28,6 @@ var gap_chance: float = 0.25
 @export var background_source_id: int = 0
 @export var background_tiles: Array[Vector2i] = []
 
-@export var door_tile: Vector2i = Vector2i.ZERO
-@export var door_source_id: int = 0
 @export var door_offset_from_end: int = 5
 
 
@@ -185,9 +185,7 @@ func _get_random_background_tile() -> Vector2i:
 func _place_exit_door(heights: Array) -> void:
 	if ground_tilemap == null:
 		return
-
-	# Door must be defined
-	if door_tile == Vector2i.ZERO:
+	if door_area == null:
 		return
 
 	# Target X position for door
@@ -207,15 +205,15 @@ func _place_exit_door(heights: Array) -> void:
 
 	if ground_y == -1:
 		# No ground near the end (rare but safe to guard)
+		door_area.visible = false
 		return
 
-	# 2-tile high door:
-	# bottom tile sits on top of ground, top tile is one tile above in the tileset
-	var bottom_pos := Vector2i(x, ground_y - 1)
-	var top_pos := Vector2i(x, ground_y - 2)
+	# Door bottom stands on top of the ground tile at (x, ground_y - 1)
+	var cell_pos := Vector2i(x, ground_y - 1)
 
-	var bottom_atlas := door_tile
-	var top_atlas := Vector2i(door_tile.x, door_tile.y - 1)
+	# Convert tile cell → world position
+	var cell_local: Vector2 = ground_tilemap.map_to_local(cell_pos)
+	var cell_global: Vector2 = ground_tilemap.to_global(cell_local)
 
-	ground_tilemap.set_cell(bottom_pos, door_source_id, bottom_atlas)
-	ground_tilemap.set_cell(top_pos, door_source_id, top_atlas)
+	door_area.global_position = cell_global
+	door_area.visible = true
