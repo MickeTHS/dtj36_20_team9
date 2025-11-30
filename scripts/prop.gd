@@ -12,10 +12,9 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	pass
 
-
 func _on_body_entered(body: Node2D) -> void:
 	if body.name == "PlayerCharacter":
 		
-		queue_free()
+		# queue_free()
 		if take_damage > 0 and body is PlayerCharacter:
 			body.add_health(-abs(take_damage))

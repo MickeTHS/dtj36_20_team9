@@ -4,6 +4,7 @@ extends CharacterBody2D
 @export var ui: UI
 @export var iframe_duration: float = 1.0   # seconds of invulnerability
 @export var jump_cut_factor: float = 0.5   # 0–1: tap = short jump, hold = full
+@export var attack_area : AttackArea
 
 const SPEED := 90.0
 const JUMP_VELOCITY := -250.0
@@ -89,12 +90,18 @@ func _physics_process(delta: float) -> void:
 		velocity.y *= jump_cut_factor
 
 	# Attack
-	if Input.is_action_just_pressed("attack") and is_on_floor():
+	if Input.is_action_just_pressed("attack"):
 		just_attacked = true
+		attack_area.enable()
 
 	# Move the character
 	move_and_slide()
 
+# Flip sprite based on movement direction
+	if direction != 0:
+		anim_sprite.flip_h = direction < 0
+		attack_area.scale.x = direction
+	
 	# --- ANIMATION STATE ---
 	if not is_on_floor():
 		if velocity.y < 0:
@@ -110,9 +117,7 @@ func _physics_process(delta: float) -> void:
 		else:
 			anim_sprite.play("idle")
 
-	# Flip sprite based on movement direction
-	if direction != 0:
-		anim_sprite.flip_h = direction < 0
+		
 
 
 func _on_attack_timer_timeout() -> void:

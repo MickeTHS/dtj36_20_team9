@@ -1,4 +1,4 @@
-[gd_scene load_steps=53 format=4 uid="uid://8n6fki16mjou"]
+[gd_scene load_steps=57 format=4 uid="uid://8n6fki16mjou"]
 
 [ext_resource type="Script" uid="uid://bohix0qc05fvw" path="res://scripts/game.gd" id="1_03owx"]
 [ext_resource type="Script" uid="uid://cnfxw346yj4px" path="res://scripts/level.gd" id="2_20pc6"]
@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://bjl8jwjes6y1n" path="res://scene/enemy_boss.tscn" id="6_5tuhn"]
 [ext_resource type="Script" uid="uid://bjgyiqulxmsun" path="res://scripts/platform_generator.gd" id="6_c2ibq"]
 [ext_resource type="Script" uid="uid://d27q2f5vleaw4" path="res://scripts/ui.gd" id="7_j4qnp"]
+[ext_resource type="PackedScene" uid="uid://bguiq03i46aua" path="res://scene/crate.tscn" id="7_mxvw5"]
 [ext_resource type="Texture2D" uid="uid://072r7kge6fyu" path="res://assets/button_restart.png" id="8_fpfj3"]
 [ext_resource type="Texture2D" uid="uid://brbyjuhxev8me" path="res://assets/hearts.png" id="9_sc1dx"]
 [ext_resource type="Script" uid="uid://dwpkn2gsgacq6" path="res://scripts/deathzone.gd" id="10_5tuhn"]
@@ -19,6 +20,8 @@
 [ext_resource type="Texture2D" uid="uid://bmtew3clc87o5" path="res://assets/light.png" id="12_sc1dx"]
 [ext_resource type="Script" uid="uid://d3rvh2ngw53mc" path="res://scripts/ui_heart.gd" id="14_c2ibq"]
 [ext_resource type="PackedScene" uid="uid://dsoj70qblpoid" path="res://scene/stalactite.tscn" id="14_kjvhd"]
+[ext_resource type="Script" uid="uid://dreprff0vrjxs" path="res://scripts/attack_area.gd" id="15_sqvbp"]
+[ext_resource type="Texture2D" uid="uid://debek5r7ob5iw" path="res://assets/placeholder.png" id="16_hri7i"]
 [ext_resource type="PackedScene" uid="uid://df73fyk85khx4" path="res://scene/roof_wine.tscn" id="17_3b0ty"]
 [ext_resource type="PackedScene" uid="uid://ni1fpwufx5c5" path="res://scene/stone.tscn" id="18_bg4s2"]
 [ext_resource type="AudioStream" uid="uid://ccchyax824hmj" path="res://assets/RANDOM_LOOPED.ogg" id="21_devvj"]
@@ -76,6 +79,9 @@ size = Vector2(20, 26)
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1d40f"]
 radius = 5.0
 height = 18.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_w3rk5"]
+size = Vector2(16, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3b0ty"]
 atlas = ExtResource("5_c6i3y")
@@ -261,6 +267,8 @@ ui = NodePath("../UILayer")
 red_step_per_level = 0.25
 desaturate_step_per_level = 0.25
 enemy_types = Array[PackedScene]([ExtResource("3_fpfj3"), ExtResource("4_sc1dx"), ExtResource("5_kjvhd"), ExtResource("6_5tuhn")])
+max_enemies_per_type = 3
+crate_scene = ExtResource("7_mxvw5")
 
 [node name="TileMapLayerBg" type="TileMapLayer" parent="Level" node_paths=PackedStringArray("target_camera")]
 modulate = Color(0.30323282, 0.30323282, 0.30323282, 1)
@@ -359,13 +367,27 @@ player = NodePath("../../PlayerCharacter")
 spikes_sprite = ExtResource("11_2gh4u")
 row_length = 1000
 
-[node name="PlayerCharacter" type="CharacterBody2D" parent="." node_paths=PackedStringArray("ui")]
+[node name="PlayerCharacter" type="CharacterBody2D" parent="." node_paths=PackedStringArray("ui", "attack_area")]
 script = ExtResource("4_5vvyt")
 ui = NodePath("../UILayer")
+attack_area = NodePath("AttackArea")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerCharacter"]
 position = Vector2(0, 6)
 shape = SubResource("CapsuleShape2D_1d40f")
+
+[node name="AttackArea" type="Area2D" parent="PlayerCharacter"]
+script = ExtResource("15_sqvbp")
+is_player = true
+metadata/_custom_type_script = "uid://dreprff0vrjxs"
+
+[node name="Sprite2D" type="Sprite2D" parent="PlayerCharacter/AttackArea"]
+position = Vector2(12, 5)
+texture = ExtResource("16_hri7i")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerCharacter/AttackArea"]
+position = Vector2(12, 5)
+shape = SubResource("RectangleShape2D_w3rk5")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="PlayerCharacter"]
 position = Vector2(0, 7)
@@ -479,6 +501,7 @@ stream = ExtResource("23_hhcpw")
 stream = ExtResource("24_mxvw5")
 
 [connection signal="body_entered" from="Level/DoorArea2D" to="Level" method="_on_door_area_2d_body_entered"]
+[connection signal="body_entered" from="PlayerCharacter/AttackArea" to="PlayerCharacter/AttackArea" method="_on_body_entered"]
 [connection signal="timeout" from="PlayerCharacter/AttackTimer" to="PlayerCharacter" method="_on_attack_timer_timeout"]
 [connection signal="timeout" from="PlayerCharacter/IFrameTimer" to="PlayerCharacter" method="_on_i_frame_timer_timeout"]
 [connection signal="pressed" from="UILayer/RestartButton" to="." method="_on_restart_button_pressed"]
