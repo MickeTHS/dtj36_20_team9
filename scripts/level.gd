@@ -15,9 +15,6 @@ extends Node2D
 @export var min_enemies_per_type: int = 2
 @export var max_enemies_per_type: int = 4
 
-@export var min_enemy_x: int = 5              # tiles from the start before enemies start appearing
-@export var max_enemy_x_margin: int = 10      # tiles from the end where enemies won't spawn
-
 var current_level: int = 1
 
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
@@ -27,21 +24,31 @@ var _enemies: Array[EnemyCharacter] = []
 func _ready() -> void:
 	if level_root != null:
 		level_root.modulate = initial_tint
-	
+
 	_rng.randomize()
 	_generate_level()
+	if ui:
+		ui.set_level(current_level)
 
 
 func _generate_level() -> void:
-	if platform_generator != null:
-		platform_generator.generate_level()
-		_clear_enemies()
-		_spawn_enemies_for_level(current_level)
+	if platform_generator == null:
+		return
+
+	platform_generator.generate_level()
+
+	# Place player at a safe spawn point between floor and roof
+	if player_character != null:
+		var player_spawn: Vector2 = platform_generator.get_player_spawn_position()
+		if player_spawn != Vector2.ZERO:
+			player_character.global_position = player_spawn
+
+	_clear_enemies()
+	_spawn_enemies_for_level(current_level)
 
 
 func on_door_reached() -> void:
-	# Call this from the door collision callback
-	player_character.position = Vector2(107, -29)
+	# Next level
 	current_level += 1
 	_generate_level()
 	_update_level_tint()
@@ -52,7 +59,7 @@ func on_door_reached() -> void:
 func _update_level_tint() -> void:
 	if level_root == null:
 		return
-	
+
 	var level_factor: float = float(current_level - 1)
 
 	var new_r: float = clamp(initial_tint.r + red_step_per_level * level_factor, 0.0, 1.0)
@@ -64,7 +71,8 @@ func _update_level_tint() -> void:
 
 func _on_door_area_2d_body_entered(body: Node2D) -> void:
 	if body.name == "PlayerCharacter":
-		on_door_reached()
+		# Defer to avoid modifying physics state while queries are flushing
+		call_deferred("on_door_reached")
 
 
 func _clear_enemies() -> void:
@@ -77,54 +85,60 @@ func _clear_enemies() -> void:
 func _spawn_enemies_for_level(level: int) -> void:
 	if enemy_types.is_empty():
 		return
-	if platform_generator == null or platform_generator.ground_tilemap == null:
-		return
-
-	var tilemap := platform_generator.ground_tilemap
-	if tilemap.tile_set == null:
+	if platform_generator == null:
 		return
 
 	# How many enemy types are available for this level?
 	var available_types: int = min(level, enemy_types.size())
-
-	var max_x: int = platform_generator.level_width - max_enemy_x_margin
-	if max_x <= min_enemy_x:
+	if available_types <= 0:
 		return
+
+	# Decide how many enemies per type and total
+	var counts: Array[int] = []
+	var total_enemies: int = 0
+
+	for type_index in range(available_types):
+		var c: int = _rng.randi_range(min_enemies_per_type, max_enemies_per_type)
+		counts.append(c)
+		total_enemies += c
+
+	if total_enemies <= 0:
+		return
+
+	# Ask the platform generator for safe, evenly spaced spawn positions
+	var spawn_positions: Array[Vector2] = platform_generator.get_enemy_spawn_positions(total_enemies)
+	if spawn_positions.is_empty():
+		return
+
+	var pos_index: int = 0
 
 	for type_index in range(available_types):
 		var scene: PackedScene = enemy_types[type_index]
 		if scene == null:
 			continue
 
-		var count: int = _rng.randi_range(min_enemies_per_type, max_enemies_per_type)
+		var count_for_type: int = counts[type_index]
 
-		for i in range(count):
-			var attempts: int = 0
-			while attempts < 10:
-				var tile_x: int = _rng.randi_range(min_enemy_x, max_x)
-				var ground_y: int = platform_generator.get_ground_y_at(tile_x)
-				if ground_y != -1:
-					var cell_pos: Vector2i = Vector2i(tile_x, ground_y - 1)
-					var local_pos: Vector2 = tilemap.map_to_local(cell_pos)
-					var global_pos: Vector2 = tilemap.to_global(local_pos)
+		for i in range(count_for_type):
+			if pos_index >= spawn_positions.size():
+				return
 
-					var enemy := scene.instantiate() as EnemyCharacter
-					if enemy == null:
-						break
+			var enemy_pos: Vector2 = spawn_positions[pos_index]
+			pos_index += 1
 
-					enemy.global_position = global_pos
-					enemy.player = player_character
+			var enemy := scene.instantiate() as EnemyCharacter
+			if enemy == null:
+				continue
 
-					call_deferred("_deferred_add_enemy", enemy)
-					break
+			enemy.global_position = enemy_pos
+			enemy.player = player_character
 
-
-				attempts += 1
+			call_deferred("_deferred_add_enemy", enemy)
 
 
 func _deferred_add_enemy(enemy: EnemyCharacter) -> void:
 	if not is_instance_valid(enemy):
 		return
-	
+
 	add_child(enemy)
 	_enemies.append(enemy)

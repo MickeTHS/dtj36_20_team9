@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://df73fyk85khx4"]
+
+[ext_resource type="Script" uid="uid://c1q6bq3l5ikpy" path="res://scripts/prop.gd" id="1_myo1o"]
+[ext_resource type="Texture2D" uid="uid://dpej88mbekbpj" path="res://assets/decent_tileset1.png" id="2_6e2x7"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sc1dx"]
+size = Vector2(11, 10.25)
+
+[node name="RoofWine" type="Area2D"]
+script = ExtResource("1_myo1o")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-0.5, -1.875)
+shape = SubResource("RectangleShape2D_sc1dx")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_6e2x7")
+region_enabled = true
+region_rect = Rect2(15.801916, 47.787823, 15.981903, 16.072926)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
