@@ -1,23 +1,46 @@
-[gd_scene load_steps=4 format=3 uid="uid://bsug6in4ddcdk"]
+[gd_scene load_steps=7 format=3 uid="uid://bsug6in4ddcdk"]
 
 [ext_resource type="Script" uid="uid://dtf7sk2udkrh4" path="res://scripts/projectile.gd" id="1_u6xv6"]
-[ext_resource type="Texture2D" uid="uid://dpej88mbekbpj" path="res://assets/decent_tileset1.png" id="2_c0tm2"]
+[ext_resource type="Texture2D" uid="uid://d0qyuvc08r3tu" path="res://assets/spit_animation.png" id="3_c0tm2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5vvyt"]
 size = Vector2(4, 14)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_ujo14"]
+atlas = ExtResource("3_c0tm2")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gaw4a"]
+atlas = ExtResource("3_c0tm2")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_5sdoi"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ujo14")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gaw4a")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
 [node name="Projectile" type="Area2D" node_paths=PackedStringArray("sprite")]
 rotation = 1.5707964
 script = ExtResource("1_u6xv6")
-sprite = NodePath("ProjectileSprite")
-
-[node name="ProjectileSprite" type="Sprite2D" parent="."]
-texture = ExtResource("2_c0tm2")
-region_enabled = true
-region_rect = Rect2(16.339975, 48.66191, 8.075592, 14.718422)
+sprite = NodePath("ProjectileAnimation")
 
 [node name="ProjectileCollisionShape" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_5vvyt")
+
+[node name="ProjectileAnimation" type="AnimatedSprite2D" parent="."]
+rotation = -1.5707964
+scale = Vector2(-1, 1)
+sprite_frames = SubResource("SpriteFrames_5sdoi")
+frame_progress = 0.19144593
 
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

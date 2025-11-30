@@ -2,7 +2,7 @@ class_name EnemyCharacter
 extends CharacterBody2D
 
 @export var player: PlayerCharacter
-
+@export var is_boss : bool = false
 @export var has_projectile: bool = true
 @export var has_sword: bool = false
 @export var has_magic: bool = false
@@ -51,6 +51,19 @@ func _randomize() -> void:
 	move_to_player = false
 	keep_distance_player = false
 
+	
+	move_speed = base_speed + randf_range(-speed_variation, speed_variation)
+	if move_speed < 10.0:
+		move_speed = 10.0
+
+	preferred_distance += randf_range(-preferred_distance_variation, preferred_distance_variation)
+	if preferred_distance < 10.0:
+		preferred_distance = 10.0
+	
+	if is_boss:
+		move_to_player = true
+		return
+
 	var mode: int = randi() % 2
 	match mode:
 		0:
@@ -59,14 +72,6 @@ func _randomize() -> void:
 		1:
 			keep_distance_player = true
 			print("keep_distance_player")
-
-	move_speed = base_speed + randf_range(-speed_variation, speed_variation)
-	if move_speed < 10.0:
-		move_speed = 10.0
-
-	preferred_distance += randf_range(-preferred_distance_variation, preferred_distance_variation)
-	if preferred_distance < 10.0:
-		preferred_distance = 10.0
 
 
 func _ready() -> void:

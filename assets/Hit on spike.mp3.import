@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://c6wydurufha07"
+path="res://.godot/imported/Hit on spike.mp3-f478f71d571f6445b21c5643ff4b4e5a.mp3str"
+
+[deps]
+
+source_file="res://assets/Hit on spike.mp3"
+dest_files=["res://.godot/imported/Hit on spike.mp3-f478f71d571f6445b21c5643ff4b4e5a.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

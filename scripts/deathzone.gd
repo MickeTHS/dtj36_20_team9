@@ -43,4 +43,4 @@ func _kill_player() -> void:
 		return
 
 	# Use your existing health system
-	player.add_health(-9999)
+	player.add_health(-9999, "DeathZone")

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://br452h8plf2g7"
+path="res://.godot/imported/Sward attack.mp3-f35dff99f0960aa64c7f9179c37ab2b9.mp3str"
+
+[deps]
+
+source_file="res://assets/Sward attack.mp3"
+dest_files=["res://.godot/imported/Sward attack.mp3-f35dff99f0960aa64c7f9179c37ab2b9.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

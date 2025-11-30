@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cns6s67ln27s6"
-path="res://.godot/imported/plant.png-e52ed90aabe11fe382e34822c5476dd5.ctex"
+uid="uid://bu4u6yy0ncyy0"
+path="res://.godot/imported/boss_projectile_animation.png-ef423003bd7e331f82bc03b49966755b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/plant.png"
-dest_files=["res://.godot/imported/plant.png-e52ed90aabe11fe382e34822c5476dd5.ctex"]
+source_file="res://assets/boss_projectile_animation.png"
+dest_files=["res://.godot/imported/boss_projectile_animation.png-ef423003bd7e331f82bc03b49966755b.ctex"]
 
 [params]
 

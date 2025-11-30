@@ -1,6 +1,14 @@
 class_name PlayerCharacter
 extends CharacterBody2D
 
+@export var hit_audio : AudioStreamPlayer
+@export var hit_on_spike_audio : AudioStreamPlayer
+@export var sword_attack_audio : AudioStreamPlayer
+@export var jump_audio : AudioStreamPlayer
+@export var magic_audio : AudioStreamPlayer
+@export var level_up_audio : AudioStreamPlayer
+@export var game_over_audio : AudioStreamPlayer
+
 @export var ui: UI
 @export var iframe_duration: float = 1.0   # seconds of invulnerability
 @export var jump_cut_factor: float = 0.5   # 0–1: tap = short jump, hold = full
@@ -23,15 +31,21 @@ var _blink_interval: float = 0.1  # how fast the sprite blinks
 @onready var iframe_timer: Timer = $IFrameTimer
 
 func set_health(h: int) -> void:
+	
 	health = h
 	if ui:
 		ui.set_health(health)
 
-func add_health(change: int) -> void:
+func add_health(change: int, source: String) -> void:
+	
 	# If taking damage while invulnerable, ignore it
 	if change < 0:
 		if is_invulnerable:
 			return
+		
+		if source == "Stalactite" or source == "DeathZone" or source == "Projectile":
+			hit_on_spike_audio.play()
+		
 		start_iframe()
 
 	health += change
@@ -43,6 +57,7 @@ func add_health(change: int) -> void:
 
 
 func start_iframe() -> void:
+	
 	is_invulnerable = true
 	_blink_accum = 0.0
 	anim_sprite.visible = true  # start from visible
@@ -84,6 +99,7 @@ func _physics_process(delta: float) -> void:
 	# Jump start
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
+		jump_audio.play()
 
 	# Variable jump height: cut jump when button is released while going up
 	if Input.is_action_just_released("jump") and velocity.y < 0.0:
@@ -93,6 +109,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("attack"):
 		just_attacked = true
 		attack_area.enable()
+		sword_attack_audio.play()
 
 	# Move the character
 	move_and_slide()
@@ -116,8 +133,6 @@ func _physics_process(delta: float) -> void:
 			anim_sprite.play("walk")
 		else:
 			anim_sprite.play("idle")
-
-		
 
 
 func _on_attack_timer_timeout() -> void:

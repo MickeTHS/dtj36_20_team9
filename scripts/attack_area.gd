@@ -1,6 +1,7 @@
 class_name AttackArea
 extends Area2D
 
+@export var hit_audio : AudioStreamPlayer
 @export var is_player : bool = false
 @export var sprite : Sprite2D
 @export var speed: float = 120.0
@@ -59,8 +60,10 @@ func _on_area_entered(area: Area2D) -> void:
 func _on_body_entered(body: Node2D) -> void:
 	print("attack_area body enter")
 	if body is EnemyCharacter:
+		hit_audio.play()
 		body.on_hit(global_position)
 	if body is RigidProp:
+		hit_audio.play()
 		body.on_hit(global_position)
 	if not is_player and body is PlayerCharacter:
-		body.add_health(-1)
+		body.add_health(-1, "Sword")

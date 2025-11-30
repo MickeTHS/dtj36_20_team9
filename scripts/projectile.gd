@@ -1,7 +1,7 @@
 class_name Projectile
 extends Area2D
 
-@export var sprite : Sprite2D
+@export var sprite : AnimatedSprite2D
 @export var speed: float = 120.0
 @export var lifetime: float = 4.0
 
@@ -12,19 +12,20 @@ func set_direction(dir: Vector2) -> void:
 	direction = dir.normalized()
 	
 	if direction.x < 0:
-		sprite.scale.y = 1
+		sprite.flip_h = true
 	else:
-		sprite.scale.y = -1
+		sprite.flip_h = false
 	
 
 func _ready() -> void:
 	_life_timer = lifetime
-	
+	sprite.play()
 
 func _process(delta: float) -> void:
 	# Move in the chosen direction
 	position += direction * speed * delta
 
+		
 	# Auto-despawn after lifetime
 	_life_timer -= delta
 	if _life_timer <= 0.0:
@@ -40,4 +41,4 @@ func _on_body_entered(body: Node2D) -> void:
 	if body.name == "PlayerCharacter":
 		queue_free()
 		if body is PlayerCharacter:
-			body.add_health(-1)
+			body.add_health(-1, "Projectile")

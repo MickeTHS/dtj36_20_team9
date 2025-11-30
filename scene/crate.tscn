@@ -1,13 +1,108 @@
-[gd_scene load_steps=4 format=3 uid="uid://bguiq03i46aua"]
+[gd_scene load_steps=18 format=3 uid="uid://bguiq03i46aua"]
 
 [ext_resource type="Script" uid="uid://ccl6ir4siuj7r" path="res://scripts/rigid_prop.gd" id="1_5i0up"]
 [ext_resource type="Texture2D" uid="uid://dpej88mbekbpj" path="res://assets/decent_tileset1.png" id="2_8mlqh"]
+[ext_resource type="Texture2D" uid="uid://kuldsvc6gnox" path="res://assets/crate_animation.png" id="3_8mlqh"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sc1dx"]
 size = Vector2(16, 16)
 
-[node name="Crate" type="RigidBody2D"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_rv2ig"]
+atlas = ExtResource("3_8mlqh")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r41h7"]
+atlas = ExtResource("3_8mlqh")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gxket"]
+atlas = ExtResource("3_8mlqh")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xcjck"]
+atlas = ExtResource("3_8mlqh")
+region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0m8qr"]
+atlas = ExtResource("3_8mlqh")
+region = Rect2(0, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qkd07"]
+atlas = ExtResource("3_8mlqh")
+region = Rect2(16, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_45l47"]
+atlas = ExtResource("3_8mlqh")
+region = Rect2(32, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d4fe7"]
+atlas = ExtResource("3_8mlqh")
+region = Rect2(48, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gfi38"]
+atlas = ExtResource("3_8mlqh")
+region = Rect2(0, 32, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w6n2o"]
+atlas = ExtResource("3_8mlqh")
+region = Rect2(16, 32, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jgh3l"]
+atlas = ExtResource("3_8mlqh")
+region = Rect2(32, 32, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l5rjj"]
+atlas = ExtResource("3_8mlqh")
+region = Rect2(48, 32, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_5i0up"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rv2ig")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r41h7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gxket")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xcjck")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0m8qr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qkd07")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_45l47")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_d4fe7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gfi38")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w6n2o")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jgh3l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l5rjj")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Crate" type="RigidBody2D" node_paths=PackedStringArray("sprite", "destroy_animation")]
 script = ExtResource("1_5i0up")
+sprite = NodePath("Sprite2D")
+destroy_animation = NodePath("DestroyAnimation")
 hp = 1
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -17,5 +112,11 @@ region_rect = Rect2(32, 48, 16, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_sc1dx")
+
+[node name="DestroyAnimation" type="AnimatedSprite2D" parent="."]
+visible = false
+sprite_frames = SubResource("SpriteFrames_5i0up")
+frame = 5
+frame_progress = 0.6105466
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
