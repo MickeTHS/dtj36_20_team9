@@ -1,9 +1,10 @@
-[gd_scene load_steps=36 format=3 uid="uid://cpa7ynkewjg0c"]
+[gd_scene load_steps=37 format=3 uid="uid://cpa7ynkewjg0c"]
 
 [ext_resource type="Script" uid="uid://d2va8dq0p3ppn" path="res://scripts/enemy.gd" id="1_p1c7d"]
 [ext_resource type="PackedScene" uid="uid://bsug6in4ddcdk" path="res://scene/projectile.tscn" id="2_5xvwy"]
 [ext_resource type="Texture2D" uid="uid://b3adr1es1h3nh" path="res://assets/bee.PNG" id="4_agd6b"]
 [ext_resource type="Texture2D" uid="uid://b3adr1es1h3nh" path="res://assets/bee.png" id="5_g8n6p"]
+[ext_resource type="AudioStream" uid="uid://b22auxdulu36a" path="res://assets/Magic attack.mp3" id="5_yprvp"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1d40f"]
 radius = 5.0
@@ -254,9 +255,13 @@ position = Vector2(0, 7)
 scale = Vector2(-1, 1)
 sprite_frames = SubResource("SpriteFrames_k8iq5")
 animation = &"attack"
-frame_progress = 0.47695038
+frame_progress = 0.60637546
 
 [node name="AttackTimer" type="Timer" parent="."]
 one_shot = true
+
+[node name="MagicAttackAudio" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_yprvp")
+volume_db = -10.0
 
 [connection signal="timeout" from="AttackTimer" to="." method="_on_attack_timer_timeout"]

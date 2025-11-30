@@ -31,6 +31,15 @@ const JUMP_VELOCITY := -150.0
 @export var hp: int = 1
 @export var knockback_force: float = 140.0   # NEW: tweak as you like
 
+@export var crush_horizontal_threshold: float = 12.0   # how close in X before we treat it as "on top"
+@export var crush_vertical_threshold: float = 8.0      # how close in Y
+@export var crush_jump_velocity: float = -220.0        # jump strength when escaping
+@export var crush_escape_cooldown: float = 0.6         # seconds between escapes
+@export var crush_horizontal_boost: float = 80.0       # extra sideways push when jumping away
+
+var _crush_timer: float = 0.0
+
+
 var move_speed: float = 60.0
 
 var just_attacked: bool = false
@@ -45,7 +54,7 @@ var _projectile_timer: float = 0.0
 
 @onready var anim_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var attack_timer: Timer = $AttackTimer
-
+@onready var magic_audio: AudioStreamPlayer = $MagicAttackAudio
 
 func _randomize() -> void:
 	move_to_player = false
@@ -105,6 +114,11 @@ func _physics_process(delta: float) -> void:
 			velocity.y += gravity * delta
 		move_and_slide()
 		return
+		
+	# Cooldown for crush escape
+	if _crush_timer > 0.0:
+		_crush_timer -= delta
+
 
 	# Apply gravity unless flying
 	if not is_flying:
@@ -127,6 +141,7 @@ func _physics_process(delta: float) -> void:
 	if not is_flying:
 		_handle_stuck_and_jump(delta, direction)
 
+	_handle_crush_escape()
 	_check_attack()
 	_handle_spawn_projectile(delta)
 
@@ -152,6 +167,36 @@ func _physics_process(delta: float) -> void:
 
 	if direction != 0.0:
 		anim_sprite.flip_h = direction < 0.0
+		
+
+func _handle_crush_escape() -> void:
+	if player == null:
+		return
+	if is_flying:
+		return
+	if _crush_timer > 0.0:
+		return
+
+	var dx: float = player.global_position.x - global_position.x
+	var dy: float = player.global_position.y - global_position.y
+	# dy > 0 => enemy is ABOVE player
+
+	if abs(dx) <= crush_horizontal_threshold \
+		and dy > 0.0 and dy <= crush_vertical_threshold \
+		and is_on_floor():
+
+		print("Enemy above player → escape jump!")
+
+		var sign: float = -1.0
+		if randf() < 0.5:
+			sign = 1.0
+
+		velocity.y = crush_jump_velocity
+		velocity.x = sign * (move_speed + crush_horizontal_boost)
+
+		attacking = false
+		_crush_timer = crush_escape_cooldown
+
 
 
 func _get_ai_direction() -> float:
@@ -211,6 +256,7 @@ func _handle_spawn_projectile(delta: float) -> void:
 	spawn_pos.y += projectile_spawn_offset.y
 
 	var proj := projectile_scene.instantiate()
+	magic_audio.play()
 	var proj_node := proj as Node2D
 	if proj_node:
 		proj_node.global_position = spawn_pos
@@ -271,6 +317,8 @@ func on_hit(hit_position: Vector2) -> void:
 		velocity.y = JUMP_VELOCITY * 0.4
 
 	hp -= 1
+	
+	print("boss hit" + str(hp))
 
 	if hp <= 0 and not is_dying:
 		is_dying = true
