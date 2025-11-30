@@ -3,6 +3,7 @@ extends CharacterBody2D
 
 @export var ui: UI
 @export var iframe_duration: float = 1.0   # seconds of invulnerability
+@export var jump_cut_factor: float = 0.5   # 0–1: tap = short jump, hold = full
 
 const SPEED := 90.0
 const JUMP_VELOCITY := -250.0
@@ -75,9 +76,13 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 
-	# Jump
+	# Jump start
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
+
+	# Variable jump height: cut jump when button is released while going up
+	if Input.is_action_just_released("jump") and velocity.y < 0.0:
+		velocity.y *= jump_cut_factor
 
 	# Attack
 	if Input.is_action_just_pressed("attack") and is_on_floor():
@@ -108,6 +113,7 @@ func _physics_process(delta: float) -> void:
 
 func _on_attack_timer_timeout() -> void:
 	attacking = false
+
 
 func _on_i_frame_timer_timeout() -> void:
 	is_invulnerable = false

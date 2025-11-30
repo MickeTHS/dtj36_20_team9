@@ -133,10 +133,60 @@ func generate_level() -> void:
 
 	_paint_ground(ground_heights)
 	_paint_roof(roof_heights)
+	_paint_walls(ground_heights, roof_heights)
 	_add_rescue_platforms(ground_heights)
 	_paint_background(ground_heights)
 	_place_exit_door(ground_heights)
 
+func _paint_walls(ground_heights: Array, roof_heights: Array) -> void:
+	if ground_tilemap == null:
+		return
+
+	# Find highest roof underside (smallest y) and lowest ground (largest y)
+	var has_ground := false
+	var has_roof := false
+	var max_ground_y: int = -100000
+	var min_roof_y: int = 100000
+
+	for x in range(level_width):
+		if x < ground_heights.size():
+			var gy = ground_heights[x]
+			if gy != null:
+				has_ground = true
+				if int(gy) > max_ground_y:
+					max_ground_y = int(gy)
+
+		if x < roof_heights.size():
+			var ry = roof_heights[x]
+			if ry != null:
+				has_roof = true
+				if int(ry) < min_roof_y:
+					min_roof_y = int(ry)
+
+	if not has_ground or not has_roof:
+		return
+
+	# Top of walls should reach top of thick roof
+	var top_y: int = min_roof_y - (roof_thickness - 1)
+	# Bottom of walls should reach bottom of solid ground
+	var bottom_y: int = max_ground_y + (solid_depth - 1)
+
+	# Choose a roof tile to use for walls
+	var wall_tile: Vector2i
+	if roof_tiles.is_empty():
+		wall_tile = _fallback_ground()
+	else:
+		wall_tile = roof_tiles[rng.randi() % roof_tiles.size()]
+
+	# Left wall at x = 0
+	var left_x: int = 0
+	for y in range(top_y, bottom_y + 1):
+		ground_tilemap.set_cell(Vector2i(left_x, y), roof_source_id, wall_tile)
+
+	# Right wall at x = level_width - 1
+	var right_x: int = level_width - 1
+	for y in range(top_y, bottom_y + 1):
+		ground_tilemap.set_cell(Vector2i(right_x, y), roof_source_id, wall_tile)
 
 
 # ------------------------------------------------------------

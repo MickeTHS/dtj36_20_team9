@@ -261,10 +261,11 @@ animations = [{
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_0omci"]
 
-[node name="Game" type="Node2D" node_paths=PackedStringArray("platform_generator", "player_character")]
+[node name="Game" type="Node2D" node_paths=PackedStringArray("platform_generator", "player_character", "level")]
 script = ExtResource("1_03owx")
 platform_generator = NodePath("LevelGenerator")
 player_character = NodePath("PlayerCharacter")
+level = NodePath("Level")
 
 [node name="Level" type="Node2D" parent="." node_paths=PackedStringArray("player_character", "platform_generator", "level_root", "ui")]
 script = ExtResource("2_20pc6")

@@ -20,6 +20,16 @@ var current_level: int = 1
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var _enemies: Array[EnemyCharacter] = []
 
+func restart_level() -> void:
+	# Optional: reset to level 1, or keep current_level if you prefer
+	current_level = 1
+	
+	_update_level_tint()
+	_generate_level()
+	
+	if ui:
+		ui.set_level(current_level)
+
 
 func _ready() -> void:
 	if level_root != null:
