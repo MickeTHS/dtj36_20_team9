@@ -1,8 +1,10 @@
 class_name UI
 extends Node
 
+@export var game : Game
 @export var restart_button : TextureButton
 
+@export var lifebar : Node2D
 @export var heart0 : UIHeart
 @export var heart1 : UIHeart
 @export var heart2 : UIHeart
@@ -13,6 +15,9 @@ extends Node
 @export var credits_button : TextureButton
 @export var exit_button : TextureButton
 
+func show_main_menu() -> void:
+	main_menu_content.visible = true
+	lifebar.visible = false
 
 func set_health(health: int) -> void:
 	heart0.set_point(0)
@@ -44,6 +49,7 @@ func set_level(level: int) -> void:
 
 
 func _ready() -> void:
+	lifebar.visible = false
 	restart_button.focus_mode = Control.FOCUS_NONE
 	start_button.focus_mode = Control.FOCUS_NONE
 	credits_button.focus_mode = Control.FOCUS_NONE
@@ -59,6 +65,8 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	pass
 
+func start_game() -> void:
+	lifebar.visible = true
 
 func _on_start_button_pressed() -> void:
 	print("start")
@@ -66,7 +74,8 @@ func _on_start_button_pressed() -> void:
 	main_menu_content.visible = false
 	if credits:
 		credits.visible = false
-
+	
+	game.start_game()
 
 
 func _on_credits_button_pressed() -> void:

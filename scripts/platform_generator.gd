@@ -119,8 +119,6 @@ var _spawned_props: Array[Node2D] = []
 func _ready() -> void:
 	rng.randomize()
 
-
-
 func generate_level() -> void:
 	if ground_tilemap == null:
 		push_error("ground_tilemap is not assigned!")

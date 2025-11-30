@@ -40,7 +40,7 @@ shape = SubResource("RectangleShape2D_5vvyt")
 rotation = -1.5707964
 scale = Vector2(-1, 1)
 sprite_frames = SubResource("SpriteFrames_5sdoi")
-frame_progress = 0.19144593
+frame_progress = 0.7419467
 
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

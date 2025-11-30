@@ -1,6 +1,7 @@
 class_name Level
 extends Node2D
 
+@export var boss_level : BossLevel
 @export var level_up_audio : AudioStreamPlayer
 @export var game_over_audio : AudioStreamPlayer
 
@@ -49,10 +50,11 @@ func _ready() -> void:
 		level_root.modulate = initial_tint
 
 	_rng.randomize()
-	_generate_level()
-	if ui:
-		ui.set_level(current_level)
 
+func teleport_to_boss_level() -> void:
+	player_character.reparent(boss_level)
+	player_character.position = Vector2.ZERO
+	boss_level.start_boss_level()
 
 func _generate_level() -> void:
 	if platform_generator == null:
@@ -81,6 +83,9 @@ func on_door_reached() -> void:
 	_update_level_tint()
 	if ui:
 		ui.set_level(current_level)
+		
+	if current_level > 1:
+		teleport_to_boss_level()
 
 
 func _update_level_tint() -> void:

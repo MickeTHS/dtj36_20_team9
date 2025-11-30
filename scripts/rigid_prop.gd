@@ -6,6 +6,7 @@ extends RigidBody2D
 @export var take_damage: int = 0      # Damage to player on touch
 @export var hp: int = 999999          # Health / hits before breaking
 @export var hit_impulse: float = 400  # How hard it flies when hit
+
 var is_dying: bool = false
 
 func _ready() -> void:

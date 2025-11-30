@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://b43r6sx8rjh6w"]
+
+[ext_resource type="Script" uid="uid://dreprff0vrjxs" path="res://scripts/attack_area.gd" id="1_ovst2"]
+[ext_resource type="Texture2D" uid="uid://debek5r7ob5iw" path="res://assets/placeholder.png" id="2_8e7p1"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_w3rk5"]
+size = Vector2(16, 23)
+
+[node name="BossAttack" type="Area2D"]
+script = ExtResource("1_ovst2")
+is_player = null
+speed = null
+lifetime = null
+damage = null
+metadata/_custom_type_script = "uid://dreprff0vrjxs"
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(12, 5)
+texture = ExtResource("2_8e7p1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(12, 3.5)
+shape = SubResource("RectangleShape2D_w3rk5")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
