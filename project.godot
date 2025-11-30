@@ -15,6 +15,10 @@ run/main_scene="uid://8n6fki16mjou"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[display]
+
+window/size/resizable=false
+
 [input]
 
 left={

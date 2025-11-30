@@ -45,6 +45,7 @@ func _generate_level() -> void:
 	if platform_generator == null:
 		return
 
+	platform_generator.level_width = 80 + (current_level * 50)
 	platform_generator.generate_level()
 
 	# Place player at a safe spawn point between floor and roof
