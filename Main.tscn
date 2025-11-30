@@ -1,4 +1,4 @@
-[gd_scene load_steps=50 format=4 uid="uid://8n6fki16mjou"]
+[gd_scene load_steps=52 format=4 uid="uid://8n6fki16mjou"]
 
 [ext_resource type="Script" uid="uid://bohix0qc05fvw" path="res://scripts/game.gd" id="1_03owx"]
 [ext_resource type="Script" uid="uid://cnfxw346yj4px" path="res://scripts/level.gd" id="2_20pc6"]
@@ -15,6 +15,8 @@
 [ext_resource type="Script" uid="uid://d27q2f5vleaw4" path="res://scripts/ui.gd" id="7_j4qnp"]
 [ext_resource type="Texture2D" uid="uid://072r7kge6fyu" path="res://assets/button_restart.png" id="8_fpfj3"]
 [ext_resource type="Texture2D" uid="uid://brbyjuhxev8me" path="res://assets/hearts.png" id="9_sc1dx"]
+[ext_resource type="Script" uid="uid://dwpkn2gsgacq6" path="res://scripts/deathzone.gd" id="10_5tuhn"]
+[ext_resource type="PackedScene" uid="uid://blg15me3xu2po" path="res://scene/deathzone.tscn" id="11_2gh4u"]
 [ext_resource type="Texture2D" uid="uid://bmtew3clc87o5" path="res://assets/light.png" id="12_sc1dx"]
 [ext_resource type="Script" uid="uid://d3rvh2ngw53mc" path="res://scripts/ui_heart.gd" id="14_c2ibq"]
 [ext_resource type="PackedScene" uid="uid://dsoj70qblpoid" path="res://scene/stalactite.tscn" id="14_kjvhd"]
@@ -69,6 +71,7 @@ size = Vector2(20, 26)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1d40f"]
 radius = 5.0
+height = 18.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_k8iq5"]
 atlas = ExtResource("5_c6i3y")
@@ -296,12 +299,19 @@ texture_filter = 1
 tile_map_data = PackedByteArray("AAAAAAIAAAAAAAAAAAABAAIAAAAAAAAAAAACAAIAAAAAAAAAAAADAAIAAAAAAAAAAAAEAAIAAAAAAAAAAAAFAAIAAAAAAAAAAAAGAAIAAAAAAAAAAAAHAAIAAAAAAAAAAAAIAAIAAAAAAAAAAAAJAAIAAAAAAAAAAAAKAAIAAAAAAAAAAAALAAIAAAAAAAAAAAD//wIAAAAAAAAAAAAMAAIAAAAAAAAAAAANAAIAAAAAAAAAAAAOAAIAAAAAAAAAAAAPAAIAAAAAAAAAAAAQAAIAAAAAAAAAAAA=")
 tile_set = SubResource("TileSet_1d40f")
 
+[node name="DeathzoneBelow" type="Node2D" parent="Level" node_paths=PackedStringArray("player")]
+position = Vector2(0, 415)
+script = ExtResource("10_5tuhn")
+player = NodePath("../../PlayerCharacter")
+spikes_sprite = ExtResource("11_2gh4u")
+row_length = 1000
+
 [node name="PlayerCharacter" type="CharacterBody2D" parent="." node_paths=PackedStringArray("ui")]
-position = Vector2(107, -29)
 script = ExtResource("4_5vvyt")
 ui = NodePath("../UILayer")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerCharacter"]
+position = Vector2(0, 6)
 shape = SubResource("CapsuleShape2D_1d40f")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="PlayerCharacter"]
@@ -333,7 +343,7 @@ surface_tiles = Array[Vector2i]([Vector2i(1, 0), Vector2i(0, 1)])
 soil_tiles = Array[Vector2i]([Vector2i(1, 1)])
 rare_soil_tiles = Array[Vector2i]([Vector2i(2, 2)])
 rare_soil_chance = 0.02
-roof_tiles = Array[Vector2i]([Vector2i(2, 0)])
+roof_tiles = Array[Vector2i]([Vector2i(0, 0)])
 prop_scene = ExtResource("14_kjvhd")
 background_tiles = Array[Vector2i]([Vector2i(1, 1)])
 

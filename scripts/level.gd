@@ -40,6 +40,7 @@ func _generate_level() -> void:
 	# Place player at a safe spawn point between floor and roof
 	if player_character != null:
 		var player_spawn: Vector2 = platform_generator.get_player_spawn_position()
+		
 		if player_spawn != Vector2.ZERO:
 			player_character.global_position = player_spawn
 

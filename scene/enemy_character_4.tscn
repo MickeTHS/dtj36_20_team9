@@ -6,6 +6,7 @@
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1d40f"]
 radius = 5.0
+height = 18.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_k8iq5"]
 atlas = ExtResource("3_3fpme")
@@ -191,12 +192,12 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="EnemyCharacter4" type="CharacterBody2D" node_paths=PackedStringArray("player")]
+[node name="EnemyCharacter4" type="CharacterBody2D"]
 script = ExtResource("1_wobeb")
-player = NodePath("")
 projectile_scene = ExtResource("2_krm07")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 6)
 shape = SubResource("CapsuleShape2D_1d40f")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]

@@ -49,6 +49,8 @@ var rare_soil_chance: float = 0.05
 @export var roof_tiles: Array[Vector2i] = []       # roof surface variants
 @export var roof_min_run: int = 2
 @export var roof_max_run: int = 4
+@export var roof_thickness: int = 10
+
 
 # Approximate vertical range for roof (smaller y = higher up)
 @export var roof_min_y: int = 2
@@ -243,12 +245,16 @@ func _paint_roof(heights: Array) -> void:
 
 		var roof_y: int = int(h)
 
-		# --- ROOF TILE ---
-		var roof_pos := Vector2i(x, roof_y)
+		# --- ROOF COLUMN (thick roof) ---
 		var roof_tile := _next_roof_tile()
-		ground_tilemap.set_cell(roof_pos, roof_source_id, roof_tile)
 
-		# --- STALACTITE PROP ---
+		# roof_y is the underside; build upward (towards smaller y)
+		var thickness: int = max(roof_thickness, 1)
+		for d in range(thickness):
+			var pos := Vector2i(x, roof_y - d)
+			ground_tilemap.set_cell(pos, roof_source_id, roof_tile)
+
+		# --- STALACTITE PROP (hanging from underside) ---
 		if prop_scene != null and rng.randf() < stalactite_chance:
 			var cell_below := Vector2i(x, roof_y + 1)
 			var local: Vector2 = ground_tilemap.map_to_local(cell_below)
@@ -259,6 +265,7 @@ func _paint_roof(heights: Array) -> void:
 				prop.global_position = global
 				add_child(prop)
 				_spawned_props.append(prop)
+
 
 
 
@@ -444,20 +451,36 @@ func _get_safe_spawn_columns() -> Array[int]:
 	return cols
 
 
-# Safe spawn position for player (world coords), standing on ground
 func get_player_spawn_position() -> Vector2:
 	if ground_tilemap == null or ground_tilemap.tile_set == null:
 		return Vector2.ZERO
 
-	var cols := _get_safe_spawn_columns()
-	if cols.is_empty():
-		return Vector2.ZERO
+	# Start at 4th column from the left (index 3), but also respect spawn_min_x
+	var start_x: int = max(3, spawn_min_x)
+	var end_x: int = level_width - spawn_max_x_margin
 
-	var x: int = cols[0]
-	var gy: int = get_ground_y_at(x)
-	var cell := Vector2i(x, gy - 1)  # one tile above ground
-	var local := ground_tilemap.map_to_local(cell)
-	return ground_tilemap.to_global(local)
+	for x in range(start_x, end_x):
+		var ground_y: int = get_ground_y_at(x)
+		if ground_y == -1:
+			continue  # no floor here, try next column
+
+		var roof_y: int = get_roof_y_at(x)  # underside of the roof
+		# If there is a roof, make sure we have enough space:
+		# spawn will be at ground_y - 3, so we need spawn_y > roof_y
+		# -> ground_y - 3 > roof_y  => ground_y - roof_y >= 4
+		if roof_y != -1:
+			if ground_y - roof_y < 4:
+				continue  # not enough vertical space, try next column
+
+		# Place player 3 tiles above the floor
+		var spawn_cell := Vector2i(x, ground_y - 3)
+		var local := ground_tilemap.map_to_local(spawn_cell)
+		var global := ground_tilemap.to_global(local)
+		global.y -= 16 * 3
+		return global
+
+	# Fallback if no column was valid
+	return Vector2.ZERO
 
 
 # Evenly spaced enemy spawn positions on ground (world coords)
