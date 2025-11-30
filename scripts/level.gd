@@ -60,7 +60,7 @@ func _generate_level() -> void:
 	if platform_generator == null:
 		return
 
-	platform_generator.level_width = 80 + (current_level * 50)
+	platform_generator.level_width = 80 + (current_level * 25)
 	platform_generator.generate_level()
 
 	# Place player at a safe spawn point between floor and roof
@@ -84,7 +84,7 @@ func on_door_reached() -> void:
 	if ui:
 		ui.set_level(current_level)
 		
-	if current_level > 1:
+	if current_level > 4:
 		teleport_to_boss_level()
 
 

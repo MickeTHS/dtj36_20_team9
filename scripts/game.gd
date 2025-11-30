@@ -5,12 +5,27 @@ extends Node
 @export var player_character : PlayerCharacter
 @export var level: Level
 @export var ui: UI
+@export var boss_level: BossLevel
+@export var enemy_boss : BossCharacter
+
+@export var game_over_audio : AudioStreamPlayer
+@export var victory_audio : AudioStreamPlayer
 
 func game_over() -> void:
+	game_over_audio.play()
 	player_character.visible = false
 	player_character.set_active(false)
-	ui.show_main_menu()
+	ui.show_game_over()
 	level.visible = false
+	boss_level.end_boss_level()
+
+func game_end() -> void:
+	victory_audio.play()
+	player_character.visible = false
+	player_character.set_active(false)
+	ui.show_the_end()
+	level.visible = false
+	boss_level.end_boss_level()
 
 
 func start_game() -> void:
@@ -24,6 +39,7 @@ func start_game() -> void:
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	ui.visible = true
+	ui.show_main_menu()
 	player_character.visible = false
 	player_character.set_active(false)
 

@@ -17,3 +17,8 @@ func _process(delta: float) -> void:
 func start_boss_level() -> void:
 	boss_music.play()
 	main_music.stop()
+
+
+func end_boss_level() -> void:
+	boss_music.stop()
+	main_music.play()

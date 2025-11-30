@@ -1,6 +1,8 @@
 class_name BossCharacter
 extends CharacterBody2D
 
+@export var game : Game
+
 # --- HIT FEEDBACK ---
 @export var knockback_force: float = 220.0
 @export var hit_flash_color: Color = Color(1.0, 0.0, 0.0, 1.0)
@@ -24,7 +26,7 @@ extends CharacterBody2D
 @export var projectile_spawn_offset: Vector2 = Vector2(8, 16)
 
 const JUMP_VELOCITY := -150.0
-@export var hp: int = 5
+@export var hp: int = 12
 
 # --- CRUSH ESCAPE (boss standing on player) ---
 @export var crush_horizontal_threshold: float = 12.0
@@ -70,8 +72,10 @@ func _reset_projectile_timer() -> void:
 
 
 func death() -> void:
-	queue_free()
-
+	game.game_end()
+	hp = 12
+	position = Vector2(839, 18)
+	is_dying = false
 
 # =============================================================
 # MAIN TICK

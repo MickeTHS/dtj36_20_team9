@@ -15,9 +15,35 @@ extends Node
 @export var credits_button : TextureButton
 @export var exit_button : TextureButton
 
+@export var game_over_text : TextureRect
+@export var title_text : TextureRect
+@export var the_end_text : TextureRect
+
+func show_game_over() -> void:
+	game_over_text.visible = true
+	title_text.visible = false
+	the_end_text.visible = false
+	main_menu_content.visible = true
+	lifebar.visible = false
+	
+	
+
+func show_the_end() -> void:
+	game_over_text.visible = false
+	title_text.visible = false
+	the_end_text.visible = true
+	
+	main_menu_content.visible = true
+	lifebar.visible = false
+	
+
 func show_main_menu() -> void:
 	main_menu_content.visible = true
 	lifebar.visible = false
+	game_over_text.visible = false
+	title_text.visible = true
+	the_end_text.visible = false
+	
 
 func set_health(health: int) -> void:
 	heart0.set_point(0)
