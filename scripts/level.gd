@@ -1,6 +1,9 @@
 class_name Level
 extends Node2D
 
+@export var level_up_audio : AudioStreamPlayer
+@export var game_over_audio : AudioStreamPlayer
+
 @export var player_character: PlayerCharacter
 @export var platform_generator: PlatformGenerator
 @export var level_root: CanvasItem        # Usually a Node2D that is parent of the whole level
@@ -15,10 +18,20 @@ extends Node2D
 @export var min_enemies_per_type: int = 2
 @export var max_enemies_per_type: int = 4
 
+# Crate / floor prop setup
+@export var crate_scene: PackedScene
+@export var min_crate_groups: int = 2
+@export var max_crate_groups: int = 6
+@export_range(0.0, 1.0, 0.01)
+var crate_pyramid_chance: float = 0.4   # chance that a group is a pyramid instead of a simple stack
+
+
 var current_level: int = 1
 
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var _enemies: Array[EnemyCharacter] = []
+var _crates: Array[Node2D] = []
+
 
 func restart_level() -> void:
 	# Optional: reset to level 1, or keep current_level if you prefer
@@ -57,9 +70,11 @@ func _generate_level() -> void:
 
 	_clear_enemies()
 	_spawn_enemies_for_level(current_level)
+	_spawn_crates_for_level(current_level)
 
 
 func on_door_reached() -> void:
+	level_up_audio.play()
 	# Next level
 	current_level += 1
 	_generate_level()
@@ -154,3 +169,118 @@ func _deferred_add_enemy(enemy: EnemyCharacter) -> void:
 
 	add_child(enemy)
 	_enemies.append(enemy)
+	
+# ------------------------------------------------------------
+# CRATES / FLOOR PROPS
+# ------------------------------------------------------------
+func _clear_crates() -> void:
+	for c in _crates:
+		if is_instance_valid(c):
+			c.queue_free()
+	_crates.clear()
+
+
+func _spawn_crates_for_level(level: int) -> void:
+	if crate_scene == null:
+		return
+	if platform_generator == null or platform_generator.ground_tilemap == null:
+		return
+
+	var tilemap := platform_generator.ground_tilemap
+
+	# Decide number of crate groups (more with higher levels, clamped)
+	var groups: int = 2 + level
+	groups = clamp(groups, min_crate_groups, max_crate_groups)
+
+	# Valid x-range for crates (avoid very edges & door region)
+	var min_x: int = max(platform_generator.spawn_min_x, 4)
+	var max_x: int = platform_generator.level_width - max(platform_generator.spawn_max_x_margin, 10)
+	if max_x <= min_x:
+		return
+
+	var used_columns: Array[int] = []
+
+	for g in range(groups):
+		var attempts: int = 0
+		var center_x: int = -1
+
+		# Find a column that we haven't used too much
+		while attempts < 10:
+			var candidate_x: int = _rng.randi_range(min_x, max_x)
+			if candidate_x in used_columns:
+				attempts += 1
+				continue
+			center_x = candidate_x
+			break
+
+		if center_x == -1:
+			continue
+
+		used_columns.append(center_x)
+
+		# Decide whether this group is a pyramid or a simple stack
+		if _rng.randf() < crate_pyramid_chance:
+			_spawn_crate_pyramid(tilemap, center_x)
+		else:
+			_spawn_crate_stack(tilemap, center_x)
+
+
+func _spawn_crate_stack(tilemap: TileMapLayer, x: int) -> void:
+	var ground_y: int = platform_generator.get_ground_y_at(x)
+	if ground_y == -1:
+		return
+
+	# 1–3 crates tall
+	var height: int = _rng.randi_range(1, 3)
+	for i in range(height):
+		var cell_y: int = ground_y - 1 - i
+		_spawn_crate_at_cell(tilemap, x, cell_y)
+
+
+# Simple 3-wide pyramid:
+#  bottom row:  x-1, x, x+1
+#  top row:     x
+func _spawn_crate_pyramid(tilemap: TileMapLayer, center_x: int) -> void:
+	var x_left: int = center_x - 1
+	var x_mid: int = center_x
+	var x_right: int = center_x + 1
+
+	# Bounds check
+	if x_left < 0 or x_right >= platform_generator.level_width:
+		# Fallback to simple stack if out of bounds
+		_spawn_crate_stack(tilemap, center_x)
+		return
+
+	var gy_left: int = platform_generator.get_ground_y_at(x_left)
+	var gy_mid: int = platform_generator.get_ground_y_at(x_mid)
+	var gy_right: int = platform_generator.get_ground_y_at(x_right)
+
+	if gy_left == -1 or gy_mid == -1 or gy_right == -1:
+		# Fallback if any column has no ground
+		_spawn_crate_stack(tilemap, center_x)
+		return
+
+	# Use min ground so crates don't sink into floor when terrain isn't perfectly flat
+	var base_y: int = min(gy_left, min(gy_mid, gy_right))
+
+	# Bottom row (three crates)
+	_spawn_crate_at_cell(tilemap, x_left,  base_y - 1)
+	_spawn_crate_at_cell(tilemap, x_mid,   base_y - 1)
+	_spawn_crate_at_cell(tilemap, x_right, base_y - 1)
+
+	# Top row (one crate above center)
+	_spawn_crate_at_cell(tilemap, x_mid, base_y - 2)
+
+
+func _spawn_crate_at_cell(tilemap: TileMapLayer, x: int, y: int) -> void:
+	var cell := Vector2i(x, y)
+	var local := tilemap.map_to_local(cell)
+	var global := tilemap.to_global(local)
+
+	var crate := crate_scene.instantiate() as Node2D
+	if crate == null:
+		return
+
+	crate.global_position = global
+	add_child(crate)
+	_crates.append(crate)

@@ -27,6 +27,7 @@ const JUMP_VELOCITY := -150.0
 
 @export var stuck_time_before_jump: float = 0.4
 @export var stuck_distance_threshold: float = 2.0
+@export var is_flying: bool = false
 
 var move_speed: float = 60.0
 
@@ -90,9 +91,12 @@ func _reset_projectile_timer() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	# Apply gravity
-	if not is_on_floor():
-		velocity.y += gravity * delta
+	# Apply gravity unless flying
+	if not is_flying:
+		if not is_on_floor():
+			velocity.y += gravity * delta
+	else:
+		velocity.y = 0.0  # keep stable when flying
 
 	var direction: float = _get_ai_direction()
 
@@ -103,13 +107,13 @@ func _physics_process(delta: float) -> void:
 		else:
 			velocity.x = move_toward(velocity.x, 0.0, move_speed)
 	else:
-		# During attack, optionally stop moving
 		velocity.x = 0.0
 
-	# Check if stuck and maybe jump
-	_handle_stuck_and_jump(delta, direction)
+	# Disable jumping/stuck logic for flying enemies
+	if not is_flying:
+		_handle_stuck_and_jump(delta, direction)
 
-	# Simple attack check
+	# Simple attack
 	_check_attack()
 	
 	# Projectile shooting
@@ -119,20 +123,29 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 	# --- ANIMATION STATE ---
-	if not is_on_floor():
-		if velocity.y < 0.0:
-			anim_sprite.play("jump")
-	elif attacking:
-		anim_sprite.play("attack")
-	else:
+	if is_flying:
+		# Flying enemies always use idle/walk depending on X velocity
 		if abs(velocity.x) > 10.0:
 			anim_sprite.play("walk")
 		else:
 			anim_sprite.play("idle")
+	else:
+		# Ground enemies use existing grounded/falling animations
+		if not is_on_floor():
+			if velocity.y < 0.0:
+				anim_sprite.play("jump")
+		elif attacking:
+			anim_sprite.play("attack")
+		else:
+			if abs(velocity.x) > 10.0:
+				anim_sprite.play("walk")
+			else:
+				anim_sprite.play("idle")
 
-	# Flip sprite based on movement direction
+	# Flip based on movement direction
 	if direction != 0.0:
 		anim_sprite.flip_h = direction < 0.0
+
 
 
 func _get_ai_direction() -> float:

@@ -1,4 +1,4 @@
-[gd_scene load_steps=51 format=4 uid="uid://8n6fki16mjou"]
+[gd_scene load_steps=53 format=4 uid="uid://8n6fki16mjou"]
 
 [ext_resource type="Script" uid="uid://bohix0qc05fvw" path="res://scripts/game.gd" id="1_03owx"]
 [ext_resource type="Script" uid="uid://cnfxw346yj4px" path="res://scripts/level.gd" id="2_20pc6"]
@@ -22,6 +22,8 @@
 [ext_resource type="PackedScene" uid="uid://df73fyk85khx4" path="res://scene/roof_wine.tscn" id="17_3b0ty"]
 [ext_resource type="PackedScene" uid="uid://ni1fpwufx5c5" path="res://scene/stone.tscn" id="18_bg4s2"]
 [ext_resource type="AudioStream" uid="uid://ccchyax824hmj" path="res://assets/RANDOM_LOOPED.ogg" id="21_devvj"]
+[ext_resource type="AudioStream" uid="uid://knrily3ogh7b" path="res://assets/LEVEL_UP.mp3" id="23_hhcpw"]
+[ext_resource type="AudioStream" uid="uid://dxlegvav3kxvt" path="res://assets/GAME_OVER.mp3" id="24_mxvw5"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_1d40f"]
 
@@ -248,8 +250,10 @@ platform_generator = NodePath("LevelGenerator")
 player_character = NodePath("PlayerCharacter")
 level = NodePath("Level")
 
-[node name="Level" type="Node2D" parent="." node_paths=PackedStringArray("player_character", "platform_generator", "level_root", "ui")]
+[node name="Level" type="Node2D" parent="." node_paths=PackedStringArray("level_up_audio", "game_over_audio", "player_character", "platform_generator", "level_root", "ui")]
 script = ExtResource("2_20pc6")
+level_up_audio = NodePath("../LevelUpAudio")
+game_over_audio = NodePath("../GameOverAudio")
 player_character = NodePath("../PlayerCharacter")
 platform_generator = NodePath("../LevelGenerator")
 level_root = NodePath(".")
@@ -398,13 +402,14 @@ hanging_vine_scene = ExtResource("17_3b0ty")
 floor_stone_scene = ExtResource("18_bg4s2")
 background_tiles = Array[Vector2i]([Vector2i(1, 1)])
 
-[node name="UILayer" type="CanvasLayer" parent="." node_paths=PackedStringArray("restart_button", "level_label", "heart0", "heart1", "heart2")]
+[node name="UILayer" type="CanvasLayer" parent="." node_paths=PackedStringArray("restart_button", "level_label", "heart0", "heart1", "heart2", "heart3")]
 script = ExtResource("7_j4qnp")
 restart_button = NodePath("RestartButton")
 level_label = NodePath("LevelLabel")
 heart0 = NodePath("Lifebar/Heart0")
 heart1 = NodePath("Lifebar/Heart1")
 heart2 = NodePath("Lifebar/Heart2")
+heart3 = NodePath("Lifebar/Heart3")
 
 [node name="RestartButton" type="TextureButton" parent="UILayer"]
 offset_left = 10.0
@@ -466,6 +471,12 @@ stream = ExtResource("21_devvj")
 volume_db = -15.012
 autoplay = true
 parameters/looping = true
+
+[node name="LevelUpAudio" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("23_hhcpw")
+
+[node name="GameOverAudio" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("24_mxvw5")
 
 [connection signal="body_entered" from="Level/DoorArea2D" to="Level" method="_on_door_area_2d_body_entered"]
 [connection signal="timeout" from="PlayerCharacter/AttackTimer" to="PlayerCharacter" method="_on_attack_timer_timeout"]

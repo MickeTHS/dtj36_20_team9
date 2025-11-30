@@ -10,7 +10,7 @@ const JUMP_VELOCITY := -250.0
 
 var just_attacked: bool = false
 var attacking: bool = false
-var health: int = 6
+var health: int = 8
 
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 
@@ -21,6 +21,10 @@ var _blink_interval: float = 0.1  # how fast the sprite blinks
 @onready var anim_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var iframe_timer: Timer = $IFrameTimer
 
+func set_health(h: int) -> void:
+	health = h
+	if ui:
+		ui.set_health(health)
 
 func add_health(change: int) -> void:
 	# If taking damage while invulnerable, ignore it
