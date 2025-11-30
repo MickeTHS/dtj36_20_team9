@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://ni1fpwufx5c5"]
+
+[ext_resource type="Texture2D" uid="uid://dpej88mbekbpj" path="res://assets/decent_tileset1.png" id="2_d6w7n"]
+
+[node name="Stone" type="Sprite2D"]
+texture = ExtResource("2_d6w7n")
+region_enabled = true
+region_rect = Rect2(0, 48, 16, 16)

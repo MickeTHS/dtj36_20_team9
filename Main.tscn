@@ -1,8 +1,7 @@
-[gd_scene load_steps=52 format=4 uid="uid://8n6fki16mjou"]
+[gd_scene load_steps=54 format=4 uid="uid://8n6fki16mjou"]
 
 [ext_resource type="Script" uid="uid://bohix0qc05fvw" path="res://scripts/game.gd" id="1_03owx"]
 [ext_resource type="Script" uid="uid://cnfxw346yj4px" path="res://scripts/level.gd" id="2_20pc6"]
-[ext_resource type="Texture2D" uid="uid://kwfymdekkvmf" path="res://assets/example-tileset.png" id="2_wkp8b"]
 [ext_resource type="Script" uid="uid://cytpe7mta0mh3" path="res://scripts/background_tilemap.gd" id="3_20pc6"]
 [ext_resource type="PackedScene" uid="uid://cpa7ynkewjg0c" path="res://scene/enemy_character_1.tscn" id="3_fpfj3"]
 [ext_resource type="Script" uid="uid://0twq1tgvxej6" path="res://scripts/player_character.gd" id="4_5vvyt"]
@@ -20,6 +19,9 @@
 [ext_resource type="Texture2D" uid="uid://bmtew3clc87o5" path="res://assets/light.png" id="12_sc1dx"]
 [ext_resource type="Script" uid="uid://d3rvh2ngw53mc" path="res://scripts/ui_heart.gd" id="14_c2ibq"]
 [ext_resource type="PackedScene" uid="uid://dsoj70qblpoid" path="res://scene/stalactite.tscn" id="14_kjvhd"]
+[ext_resource type="PackedScene" uid="uid://df73fyk85khx4" path="res://scene/roof_wine.tscn" id="17_3b0ty"]
+[ext_resource type="PackedScene" uid="uid://ni1fpwufx5c5" path="res://scene/stone.tscn" id="18_bg4s2"]
+[ext_resource type="AudioStream" uid="uid://ccchyax824hmj" path="res://assets/RANDOM_LOOPED.ogg" id="21_devvj"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_1d40f"]
 
@@ -285,20 +287,86 @@ script = ExtResource("3_20pc6")
 target_camera = NodePath("../../PlayerCharacter/Camera2D")
 parallax_factor = Vector2(0.2, 0)
 
-[node name="DoorArea2D" type="Area2D" parent="Level"]
-
-[node name="ExitDoorSprite" type="Sprite2D" parent="Level/DoorArea2D"]
-texture = ExtResource("2_wkp8b")
-region_enabled = true
-region_rect = Rect2(78.56232, 149.13852, 18.949638, 27.886353)
-
-[node name="DoorCollisionShape2D" type="CollisionShape2D" parent="Level/DoorArea2D"]
-shape = SubResource("RectangleShape2D_wkp8b")
-
 [node name="TileMapLayer" type="TileMapLayer" parent="Level"]
 texture_filter = 1
 tile_map_data = PackedByteArray("AAAAAAIAAAAAAAAAAAABAAIAAAAAAAAAAAACAAIAAAAAAAAAAAADAAIAAAAAAAAAAAAEAAIAAAAAAAAAAAAFAAIAAAAAAAAAAAAGAAIAAAAAAAAAAAAHAAIAAAAAAAAAAAAIAAIAAAAAAAAAAAAJAAIAAAAAAAAAAAAKAAIAAAAAAAAAAAALAAIAAAAAAAAAAAD//wIAAAAAAAAAAAAMAAIAAAAAAAAAAAANAAIAAAAAAAAAAAAOAAIAAAAAAAAAAAAPAAIAAAAAAAAAAAAQAAIAAAAAAAAAAAA=")
 tile_set = SubResource("TileSet_1d40f")
+
+[node name="DoorArea2D" type="Area2D" parent="Level"]
+
+[node name="ExitDoorSprite" type="Sprite2D" parent="Level/DoorArea2D"]
+texture = ExtResource("4_20pc6")
+region_enabled = true
+region_rect = Rect2(0, 32, 16, 16)
+
+[node name="ExitDoorSprite2" type="Sprite2D" parent="Level/DoorArea2D"]
+position = Vector2(0, 16)
+texture = ExtResource("4_20pc6")
+region_enabled = true
+region_rect = Rect2(0, 32, 16, 16)
+
+[node name="ExitDoorSprite3" type="Sprite2D" parent="Level/DoorArea2D"]
+position = Vector2(0, 32)
+texture = ExtResource("4_20pc6")
+region_enabled = true
+region_rect = Rect2(0, 32, 16, 16)
+
+[node name="ExitDoorSprite4" type="Sprite2D" parent="Level/DoorArea2D"]
+position = Vector2(0, 48)
+texture = ExtResource("4_20pc6")
+region_enabled = true
+region_rect = Rect2(0, 32, 16, 16)
+
+[node name="ExitDoorSprite5" type="Sprite2D" parent="Level/DoorArea2D"]
+position = Vector2(0, 64)
+texture = ExtResource("4_20pc6")
+region_enabled = true
+region_rect = Rect2(0, 32, 16, 16)
+
+[node name="ExitDoorSprite6" type="Sprite2D" parent="Level/DoorArea2D"]
+position = Vector2(0, 80)
+texture = ExtResource("4_20pc6")
+region_enabled = true
+region_rect = Rect2(0, 32, 16, 16)
+
+[node name="ExitDoorSprite7" type="Sprite2D" parent="Level/DoorArea2D"]
+position = Vector2(0, 96)
+texture = ExtResource("4_20pc6")
+region_enabled = true
+region_rect = Rect2(0, 32, 16, 16)
+
+[node name="ExitDoorSprite8" type="Sprite2D" parent="Level/DoorArea2D"]
+position = Vector2(0, 112)
+texture = ExtResource("4_20pc6")
+region_enabled = true
+region_rect = Rect2(0, 32, 16, 16)
+
+[node name="ExitDoorSprite9" type="Sprite2D" parent="Level/DoorArea2D"]
+position = Vector2(0, 128)
+texture = ExtResource("4_20pc6")
+region_enabled = true
+region_rect = Rect2(0, 32, 16, 16)
+
+[node name="ExitDoorSprite10" type="Sprite2D" parent="Level/DoorArea2D"]
+position = Vector2(0, 144)
+texture = ExtResource("4_20pc6")
+region_enabled = true
+region_rect = Rect2(0, 32, 16, 16)
+
+[node name="ExitDoorSprite11" type="Sprite2D" parent="Level/DoorArea2D"]
+position = Vector2(0, 160)
+texture = ExtResource("4_20pc6")
+region_enabled = true
+region_rect = Rect2(0, 32, 16, 16)
+
+[node name="ExitDoorSprite12" type="Sprite2D" parent="Level/DoorArea2D"]
+position = Vector2(0, 176)
+texture = ExtResource("4_20pc6")
+region_enabled = true
+region_rect = Rect2(0, 32, 16, 16)
+
+[node name="DoorCollisionShape2D" type="CollisionShape2D" parent="Level/DoorArea2D"]
+shape = SubResource("RectangleShape2D_wkp8b")
 
 [node name="DeathzoneBelow" type="Node2D" parent="Level" node_paths=PackedStringArray("player")]
 position = Vector2(0, 415)
@@ -345,7 +413,9 @@ soil_tiles = Array[Vector2i]([Vector2i(1, 1)])
 rare_soil_tiles = Array[Vector2i]([Vector2i(2, 2)])
 rare_soil_chance = 0.02
 roof_tiles = Array[Vector2i]([Vector2i(0, 0)])
-prop_scene = ExtResource("14_kjvhd")
+stalactite_scene = ExtResource("14_kjvhd")
+hanging_vine_scene = ExtResource("17_3b0ty")
+floor_stone_scene = ExtResource("18_bg4s2")
 background_tiles = Array[Vector2i]([Vector2i(1, 1)])
 
 [node name="UILayer" type="CanvasLayer" parent="." node_paths=PackedStringArray("restart_button", "level_label", "heart0", "heart1", "heart2")]
@@ -402,6 +472,12 @@ text = "Level 1"
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_0omci")
 camera_attributes = SubResource("CameraAttributesPractical_0omci")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("21_devvj")
+volume_db = -15.012
+autoplay = true
+parameters/looping = true
 
 [connection signal="body_entered" from="Level/DoorArea2D" to="Level" method="_on_door_area_2d_body_entered"]
 [connection signal="timeout" from="PlayerCharacter/AttackTimer" to="PlayerCharacter" method="_on_attack_timer_timeout"]
