@@ -1,3 +1,7 @@
+# --------
+# randomly generated platform level
+# --------
+
 class_name PlatformGenerator
 extends Node2D
 

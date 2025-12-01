@@ -1,3 +1,12 @@
+# ------
+# level controller
+# make sure player is in correct place
+# exit ladder/door
+# spawn enemies
+# spawn crates
+# call the level generator or teleport to boss room
+# ------
+
 class_name Level
 extends Node2D
 

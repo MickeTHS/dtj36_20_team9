@@ -1,3 +1,9 @@
+# -------
+# became too complex due to our ideas of making 
+# "random" enemies with random properties
+# in the end this became quite a mess
+# -------
+
 class_name EnemyCharacter
 extends CharacterBody2D
 

@@ -1,3 +1,7 @@
+# -------
+# just a standard platform player character
+# -------
+
 class_name PlayerCharacter
 extends CharacterBody2D
 

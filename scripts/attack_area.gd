@@ -1,3 +1,8 @@
+# ------------
+# An attack that uses an Area2D
+# Can be the player or npc making the attack
+# When hitting a body or another area will call on_hit()
+# ------------
 class_name AttackArea
 extends Area2D
 

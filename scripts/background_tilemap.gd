@@ -1,3 +1,6 @@
+# ------
+# Parallax effect
+# ------
 extends TileMapLayer
 
 @export var target_camera: Camera2D

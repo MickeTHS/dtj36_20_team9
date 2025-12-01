@@ -1,3 +1,7 @@
+# ------
+# shows full, half or empty heart
+# ------
+
 class_name UIHeart extends Sprite2D
 
 var points : int = 2

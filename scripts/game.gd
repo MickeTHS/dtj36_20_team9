@@ -1,3 +1,7 @@
+# -------
+# keep track of the current game state
+# -------
+
 class_name Game
 extends Node
 

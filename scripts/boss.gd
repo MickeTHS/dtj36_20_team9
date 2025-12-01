@@ -1,3 +1,9 @@
+# ----- 
+# decided to separate the boss into its own class
+# because of bugs due to complexity of different
+# types of enemies
+# -----
+
 class_name BossCharacter
 extends CharacterBody2D
 

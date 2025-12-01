@@ -1,3 +1,6 @@
+# ------
+# quickfix to make a boss level play correct music
+# ------
 class_name BossLevel
 extends Node2D
 

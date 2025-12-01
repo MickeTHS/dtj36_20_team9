@@ -1,3 +1,6 @@
+# ------
+# when player falls into deatzone, will die
+# ------
 class_name DeathZone
 extends Node2D
 

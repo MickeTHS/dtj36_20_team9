@@ -1,3 +1,7 @@
+# -----
+# standard prop 
+# -----
+
 class_name Prop extends Area2D
 
 @export var take_damage : int = 0

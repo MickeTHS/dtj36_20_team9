@@ -1,3 +1,7 @@
+# ----- 
+# rigid prop, destructible
+# -----
+
 class_name RigidProp
 extends RigidBody2D
 
