@@ -7,24 +7,22 @@ extends Node2D
 
 @export var player_character: PlayerCharacter
 @export var platform_generator: PlatformGenerator
-@export var level_root: CanvasItem        # Usually a Node2D that is parent of the whole level
+@export var level_root: CanvasItem
 @export var ui: UI
 
 @export var initial_tint: Color = Color(1.0, 1.0, 1.0, 1.0)
-@export var red_step_per_level: float = 0.08         # How much more red each level becomes
-@export var desaturate_step_per_level: float = 0.04  # How much G/B shrink each level
+@export var red_step_per_level: float = 0.08
+@export var desaturate_step_per_level: float = 0.04
 
-# Enemy setup
-@export var enemy_types: Array[PackedScene] = []  # 0 = type1, 1 = type2, ...
+@export var enemy_types: Array[PackedScene] = []
 @export var min_enemies_per_type: int = 2
 @export var max_enemies_per_type: int = 4
 
-# Crate / floor prop setup
 @export var crate_scene: PackedScene
 @export var min_crate_groups: int = 2
 @export var max_crate_groups: int = 6
 @export_range(0.0, 1.0, 0.01)
-var crate_pyramid_chance: float = 0.4   # chance that a group is a pyramid instead of a simple stack
+var crate_pyramid_chance: float = 0.4
 
 
 var current_level: int = 1
@@ -35,7 +33,6 @@ var _crates: Array[Node2D] = []
 
 
 func restart_level() -> void:
-	# Optional: reset to level 1, or keep current_level if you prefer
 	current_level = 1
 	
 	_update_level_tint()
@@ -63,7 +60,6 @@ func _generate_level() -> void:
 	platform_generator.level_width = 80 + (current_level * 25)
 	platform_generator.generate_level()
 
-	# Place player at a safe spawn point between floor and roof
 	if player_character != null:
 		var player_spawn: Vector2 = platform_generator.get_player_spawn_position()
 		
@@ -77,7 +73,7 @@ func _generate_level() -> void:
 
 func on_door_reached() -> void:
 	level_up_audio.play()
-	# Next level
+	
 	current_level += 1
 	_generate_level()
 	_update_level_tint()
@@ -103,7 +99,6 @@ func _update_level_tint() -> void:
 
 func _on_door_area_2d_body_entered(body: Node2D) -> void:
 	if body.name == "PlayerCharacter":
-		# Defer to avoid modifying physics state while queries are flushing
 		call_deferred("on_door_reached")
 
 
@@ -120,12 +115,10 @@ func _spawn_enemies_for_level(level: int) -> void:
 	if platform_generator == null:
 		return
 
-	# How many enemy types are available for this level?
 	var available_types: int = min(level, enemy_types.size())
 	if available_types <= 0:
 		return
 
-	# Decide how many enemies per type and total
 	var counts: Array[int] = []
 	var total_enemies: int = 0
 
@@ -137,7 +130,6 @@ func _spawn_enemies_for_level(level: int) -> void:
 	if total_enemies <= 0:
 		return
 
-	# Ask the platform generator for safe, evenly spaced spawn positions
 	var spawn_positions: Array[Vector2] = platform_generator.get_enemy_spawn_positions(total_enemies)
 	if spawn_positions.is_empty():
 		return
@@ -193,11 +185,9 @@ func _spawn_crates_for_level(level: int) -> void:
 
 	var tilemap := platform_generator.ground_tilemap
 
-	# Decide number of crate groups (more with higher levels, clamped)
 	var groups: int = 2 + level
 	groups = clamp(groups, min_crate_groups, max_crate_groups)
 
-	# Valid x-range for crates (avoid very edges & door region)
 	var min_x: int = max(platform_generator.spawn_min_x, 4)
 	var max_x: int = platform_generator.level_width - max(platform_generator.spawn_max_x_margin, 10)
 	if max_x <= min_x:
@@ -209,7 +199,6 @@ func _spawn_crates_for_level(level: int) -> void:
 		var attempts: int = 0
 		var center_x: int = -1
 
-		# Find a column that we haven't used too much
 		while attempts < 10:
 			var candidate_x: int = _rng.randi_range(min_x, max_x)
 			if candidate_x in used_columns:
@@ -223,7 +212,6 @@ func _spawn_crates_for_level(level: int) -> void:
 
 		used_columns.append(center_x)
 
-		# Decide whether this group is a pyramid or a simple stack
 		if _rng.randf() < crate_pyramid_chance:
 			_spawn_crate_pyramid(tilemap, center_x)
 		else:
@@ -242,17 +230,12 @@ func _spawn_crate_stack(tilemap: TileMapLayer, x: int) -> void:
 		_spawn_crate_at_cell(tilemap, x, cell_y)
 
 
-# Simple 3-wide pyramid:
-#  bottom row:  x-1, x, x+1
-#  top row:     x
 func _spawn_crate_pyramid(tilemap: TileMapLayer, center_x: int) -> void:
 	var x_left: int = center_x - 1
 	var x_mid: int = center_x
 	var x_right: int = center_x + 1
 
-	# Bounds check
 	if x_left < 0 or x_right >= platform_generator.level_width:
-		# Fallback to simple stack if out of bounds
 		_spawn_crate_stack(tilemap, center_x)
 		return
 
@@ -261,19 +244,15 @@ func _spawn_crate_pyramid(tilemap: TileMapLayer, center_x: int) -> void:
 	var gy_right: int = platform_generator.get_ground_y_at(x_right)
 
 	if gy_left == -1 or gy_mid == -1 or gy_right == -1:
-		# Fallback if any column has no ground
 		_spawn_crate_stack(tilemap, center_x)
 		return
 
-	# Use min ground so crates don't sink into floor when terrain isn't perfectly flat
 	var base_y: int = min(gy_left, min(gy_mid, gy_right))
 
-	# Bottom row (three crates)
 	_spawn_crate_at_cell(tilemap, x_left,  base_y - 1)
 	_spawn_crate_at_cell(tilemap, x_mid,   base_y - 1)
 	_spawn_crate_at_cell(tilemap, x_right, base_y - 1)
 
-	# Top row (one crate above center)
 	_spawn_crate_at_cell(tilemap, x_mid, base_y - 2)
 
 

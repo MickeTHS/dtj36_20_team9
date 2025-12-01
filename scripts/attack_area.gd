@@ -32,16 +32,13 @@ func disable() -> void:
 		return
 	_disabled = true
 
-	# turn off collision
 	monitoring = false
 	monitorable = false
 
-	# hide visuals
 	if sprite:
 		sprite.visible = false
 	visible = false
 
-	# stop movement & updates
 	set_process(false)
 	set_physics_process(false)
 
@@ -56,7 +53,6 @@ func enable():
 	set_physics_process(true)
 
 
-# Optional if you want collision behavior
 func _on_area_entered(area: Area2D) -> void:
 	pass
 

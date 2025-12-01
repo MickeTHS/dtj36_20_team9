@@ -90,11 +90,9 @@ func _physics_process(delta: float) -> void:
 	if _crush_timer > 0.0:
 		_crush_timer -= delta
 
-	# Gravity
 	if not is_on_floor():
 		velocity.y += gravity * delta
 
-	# Movement AI
 	var direction := _get_ai_direction()
 
 	if not attacking:
@@ -111,7 +109,6 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-	# Animation
 	if not is_on_floor():
 		if velocity.y < 0.0:
 			anim_sprite.play("jump")
@@ -125,7 +122,6 @@ func _physics_process(delta: float) -> void:
 		else:
 			anim_sprite.play("idle")
 
-	# Direction face
 	if direction != 0.0:
 		anim_sprite.flip_h = direction < 0.0
 		if attack_area:
@@ -153,11 +149,11 @@ func _get_ai_direction() -> float:
 	var tol := preferred_distance_tolerance
 
 	if dist < target - tol:
-		return -sign_x  # too close
+		return -sign_x
 	elif dist > target + tol:
-		return sign_x   # too far
+		return sign_x
 	else:
-		return 0.0      # perfect distance
+		return 0.0
 
 
 # =============================================================
@@ -176,7 +172,6 @@ func _handle_crush_escape() -> void:
 	and dy > 0.0 and dy <= crush_vertical_threshold \
 	and is_on_floor():
 
-		# Random escape direction
 		var sign := -1.0
 		if randf() < 0.5:
 			sign = 1.0
@@ -257,7 +252,6 @@ func on_hit(hit_position: Vector2) -> void:
 	if is_dying:
 		return
 
-	# Knockback
 	var dir := (global_position - hit_position).normalized()
 	if dir == Vector2.ZERO:
 		dir = Vector2.RIGHT
@@ -266,7 +260,6 @@ func on_hit(hit_position: Vector2) -> void:
 	if is_on_floor():
 		velocity.y = JUMP_VELOCITY * 0.4
 
-	# flash
 	anim_sprite.modulate = hit_flash_color
 	var tween := create_tween()
 	tween.tween_property(anim_sprite, "modulate", Color.WHITE, hit_flash_time)

@@ -36,7 +36,6 @@ func start_game() -> void:
 	level.visible = true
 	level.restart_level()
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	ui.visible = true
 	ui.show_main_menu()
@@ -44,7 +43,6 @@ func _ready() -> void:
 	player_character.set_active(false)
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
 

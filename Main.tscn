@@ -815,9 +815,6 @@ script = ExtResource("15_sqvbp")
 player_character = NodePath("..")
 hit_audio = NodePath("../../../HitAudio")
 is_player = true
-speed = null
-lifetime = null
-damage = null
 metadata/_custom_type_script = "uid://dreprff0vrjxs"
 
 [node name="Sprite2D" type="Sprite2D" parent="BossLevel/PlayerCharacter/AttackArea"]

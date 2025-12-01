@@ -3,12 +3,10 @@ class_name Prop extends Area2D
 @export var take_damage : int = 0
 @export var hp : int = 999999
 
-# Called when the node enters the scene tree for the first time.
+
 func _ready() -> void:
-	pass # Replace with function body.
+	pass
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
 

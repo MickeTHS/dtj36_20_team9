@@ -1,16 +1,15 @@
 class_name PlatformGenerator
 extends Node2D
 
-@export var door_area: Area2D   # The Area2D door instance to move
+@export var door_area: Area2D
 
 @export var ground_tilemap: TileMapLayer
 @export var background_tilemap: TileMapLayer
 
-# ====== LEVEL SHAPE SETTINGS ======
 @export var level_width: int = 200
 @export var min_ground_y: int = 8
 @export var max_ground_y: int = 14
-@export var solid_depth: int = 6     # surface + subsurface + deep soil
+@export var solid_depth: int = 6
 
 @export var max_jump_gap: int = 3
 @export var max_pit_width: int = 10
@@ -23,36 +22,30 @@ var uneven_chance: float = 0.4
 var gap_chance: float = 0.25
 
 
-# ====== GROUND TILE SETTINGS ======
 @export var ground_source_id: int = 0
 
-# Visible top of ground (floor)
-@export var surface_tiles: Array[Vector2i] = []     # 2–3 different floor variants
+
+@export var surface_tiles: Array[Vector2i] = []
 @export var surface_min_run: int = 2
 @export var surface_max_run: int = 4
 
-# The row directly under the floor
-@export var subsurface_tiles: Array[Vector2i] = []  # typically "edge" dirt visuals
+@export var subsurface_tiles: Array[Vector2i] = []
 
-# Deep soil tiles (base)
 @export var soil_tile: Vector2i = Vector2i.ZERO
 @export var soil_tiles: Array[Vector2i] = []
 
-# Rare "special" soil tiles
 @export var rare_soil_tiles: Array[Vector2i] = []
 @export_range(0.0, 1.0, 0.01)
 var rare_soil_chance: float = 0.05
 
 
-# ====== ROOF SETTINGS ======
 @export var roof_source_id: int = 0
-@export var roof_tiles: Array[Vector2i] = []       # roof surface variants
+@export var roof_tiles: Array[Vector2i] = []
 @export var roof_min_run: int = 2
 @export var roof_max_run: int = 4
 @export var roof_thickness: int = 10
 
 
-# Approximate vertical range for roof (smaller y = higher up)
 @export var roof_min_y: int = 2
 @export var roof_max_y: int = 5
 
@@ -60,30 +53,24 @@ var rare_soil_chance: float = 0.05
 var roof_uneven_chance: float = 0.3
 @export var roof_max_step_height: int = 1
 
-# Minimum vertical gap between roof and ground to consider it "safe"
 @export var min_vertical_clearance: int = 4
 
 
-# ====== PROPS (stalactites, vines, floor stones, etc) ======
-
-# Roof props
-@export var stalactite_scene: PackedScene      # hanging from roof
-@export var hanging_vine_scene: PackedScene    # 1-tile hanging vine
+@export var stalactite_scene: PackedScene
+@export var hanging_vine_scene: PackedScene
 
 @export_range(0.0, 1.0, 0.01)
-var roof_prop_chance: float = 0.12             # chance per roof column to spawn *a* prop
+var roof_prop_chance: float = 0.12
 
 @export_range(0.0, 1.0, 0.01)
-var stalactite_bias: float = 0.6              # 0–1, probability of stalactite vs vine
+var stalactite_bias: float = 0.6
 
-# Floor props
-@export var floor_stone_scene: PackedScene     # stone resting on floor
+@export var floor_stone_scene: PackedScene
 
 @export_range(0.0, 1.0, 0.01)
-var floor_stone_chance: float = 0.08          # chance per ground column to spawn a stone
+var floor_stone_chance: float = 0.08
 
 
-# ====== BACKGROUND SETTINGS ======
 @export var background_source_id: int = 0
 @export var background_tiles: Array[Vector2i] = []
 
@@ -93,23 +80,17 @@ var background_fill_chance: float = 0.6
 
 @export var door_offset_from_end: int = 5
 
+@export var spawn_min_x: int = 3
+@export var spawn_max_x_margin: int = 8
 
-# ====== SPAWN SETTINGS (for player & enemies) ======
-@export var spawn_min_x: int = 3          # tiles from left edge
-@export var spawn_max_x_margin: int = 8   # tiles from right edge to avoid door
-
-
-# ====== INTERNAL ======
 var rng := RandomNumberGenerator.new()
 
 var last_ground_heights: Array = []
 var last_roof_heights: Array = []
 
-# Surface tile run state
 var _surface_run_remaining: int = 0
 var _current_surface_tile: Vector2i = Vector2i.ZERO
 
-# Roof tile run state
 var _roof_run_remaining: int = 0
 var _current_roof_tile: Vector2i = Vector2i.ZERO
 
@@ -124,12 +105,11 @@ func generate_level() -> void:
 		push_error("ground_tilemap is not assigned!")
 		return
 
-	# Clear tiles
 	ground_tilemap.clear()
 	if background_tilemap:
 		background_tilemap.clear()
 
-	# Clear old props
+
 	for p in _spawned_props:
 		if is_instance_valid(p):
 			p.queue_free()
@@ -138,12 +118,11 @@ func generate_level() -> void:
 	var ground_heights := _generate_ground_profile()
 	last_ground_heights = ground_heights
 	
-	# Debug print the entire ground height profile
 	var line := ""
 	for i in range(ground_heights.size()):
 		var h = ground_heights[i]
 		if h == null:
-			line += " --"        # gap
+			line += " --"
 		else:
 			line += " %02d" % int(h)
 
@@ -153,12 +132,11 @@ func generate_level() -> void:
 	var roof_heights := _generate_roof_profile(ground_heights)
 	last_roof_heights = roof_heights
 	
-	# Debug print the entire ground height profile
 	line = ""
 	for i in range(roof_heights.size()):
 		var h = roof_heights[i]
 		if h == null:
-			line += " --"        # gap
+			line += " --"
 		else:
 			line += " %02d" % int(h)
 
@@ -177,7 +155,6 @@ func _paint_walls(ground_heights: Array, roof_heights: Array) -> void:
 	if ground_tilemap == null:
 		return
 
-	# Find highest roof underside (smallest y) and lowest ground (largest y)
 	var has_ground := false
 	var has_roof := false
 	var max_ground_y: int = -100000
@@ -201,24 +178,19 @@ func _paint_walls(ground_heights: Array, roof_heights: Array) -> void:
 	if not has_ground or not has_roof:
 		return
 
-	# Top of walls should reach top of thick roof
 	var top_y: int = min_roof_y - (roof_thickness - 1)
-	# Bottom of walls should reach bottom of solid ground
 	var bottom_y: int = max_ground_y + (solid_depth - 1)
 
-	# Choose a roof tile to use for walls
 	var wall_tile: Vector2i
 	if roof_tiles.is_empty():
 		wall_tile = _fallback_ground()
 	else:
 		wall_tile = roof_tiles[rng.randi() % roof_tiles.size()]
 
-	# Left wall at x = 0
 	var left_x: int = 0
 	for y in range(top_y, bottom_y + 1):
 		ground_tilemap.set_cell(Vector2i(left_x, y), roof_source_id, wall_tile)
 
-	# Right wall at x = level_width - 1
 	var right_x: int = level_width - 1
 	for y in range(top_y, bottom_y + 1):
 		ground_tilemap.set_cell(Vector2i(right_x, y), roof_source_id, wall_tile)
@@ -268,7 +240,6 @@ func _generate_roof_profile(ground_heights: Array) -> Array:
 
 		current_y = clamp(current_y + delta, roof_min_y, roof_max_y)
 
-		# Make sure the roof is always at least min_vertical_clearance above the ground if ground exists
 		var gy = ground_heights[x] if x < ground_heights.size() else null
 		if gy != null:
 			var max_roof_y_allowed: int = int(gy) - min_vertical_clearance
@@ -294,18 +265,15 @@ func _paint_ground(heights: Array) -> void:
 
 		var surface_y: int = int(h)
 
-		# --- SURFACE / FLOOR ---
 		var surface_pos := Vector2i(x, surface_y)
 		var surf_tile := _next_surface_tile()
 		ground_tilemap.set_cell(surface_pos, ground_source_id, surf_tile)
 
-		# --- SUBSURFACE ---
 		if solid_depth > 1:
 			var sub_pos := Vector2i(x, surface_y + 1)
 			var sub_tile := _get_subsurface_tile()
 			ground_tilemap.set_cell(sub_pos, ground_source_id, sub_tile)
 
-		# --- DEEP SOIL ---
 		for d in range(2, solid_depth):
 			var pos := Vector2i(x, surface_y + d)
 			var soil := _get_deep_soil_tile()
@@ -330,21 +298,17 @@ func _paint_roof(heights: Array) -> void:
 
 		var roof_y: int = int(h)
 
-		# --- ROOF COLUMN (thick roof) ---
 		var roof_tile := _next_roof_tile()
 
-		# roof_y is the underside; build upward (towards smaller y)
 		var thickness: int = max(roof_thickness, 1)
 		for d in range(thickness):
 			var pos := Vector2i(x, roof_y - d)
 			ground_tilemap.set_cell(pos, roof_source_id, roof_tile)
 
-		# --- ROOF PROPS: stalactite OR vine ---
 		if rng.randf() < roof_prop_chance:
 			var scene_to_use: PackedScene = null
 
 			if stalactite_scene != null and hanging_vine_scene != null:
-				# Random choice using bias
 				if rng.randf() < stalactite_bias:
 					scene_to_use = stalactite_scene
 				else:
@@ -376,14 +340,11 @@ func _paint_floor_props(heights: Array) -> void:
 		if h == null:
 			continue
 
-		# Random chance per ground column
 		if rng.randf() > floor_stone_chance:
 			continue
 
 		var ground_y: int = int(h)
 
-		# Place the stone so it visually rests on top of the floor tile.
-		# We use the cell *above* the floor tile (ground_y - 1).
 		var cell_above := Vector2i(x, ground_y - 1)
 		var local := ground_tilemap.map_to_local(cell_above)
 		var global := ground_tilemap.to_global(local)
@@ -449,11 +410,6 @@ func _get_deep_soil_tile() -> Vector2i:
 func _fallback_ground() -> Vector2i:
 	return Vector2i.ZERO
 
-
-
-# ------------------------------------------------------------
-# rescue platforms for large pits
-# ------------------------------------------------------------
 func _add_rescue_platforms(heights: Array) -> void:
 	var x: int = 0
 	while x < heights.size():
@@ -492,11 +448,6 @@ func _place_platforms_in_gap(heights: Array, start: int, end: int) -> void:
 		ground_tilemap.set_cell(pos, ground_source_id, tile)
 		px += max_jump_gap
 
-
-
-# ------------------------------------------------------------
-# BACKGROUND
-# ------------------------------------------------------------
 func _paint_background(heights: Array) -> void:
 	if background_tilemap == null or background_tiles.is_empty():
 		return
@@ -517,10 +468,6 @@ func _paint_background(heights: Array) -> void:
 				background_tilemap.set_cell(pos, background_source_id, tile)
 
 
-
-# ------------------------------------------------------------
-# PLACE EXIT DOOR AREA2D
-# ------------------------------------------------------------
 func _place_exit_door(heights: Array) -> void:
 	if door_area == null:
 		return
@@ -546,10 +493,6 @@ func _place_exit_door(heights: Array) -> void:
 	door_area.visible = true
 
 
-
-# ------------------------------------------------------------
-# API FOR SPAWNING (GROUND / ROOF / SAFE SPOTS)
-# ------------------------------------------------------------
 func get_ground_y_at(x: int) -> int:
 	if x < 0 or x >= last_ground_heights.size():
 		return -1
@@ -581,24 +524,21 @@ func get_player_spawn_position() -> Vector2:
 	if ground_tilemap == null or ground_tilemap.tile_set == null:
 		return Vector2.ZERO
 
-	# Start at 4th column from the left (index 3), but also respect spawn_min_x
 	var start_x: int = max(3, spawn_min_x)
 	var end_x: int = level_width - spawn_max_x_margin
 
 	for x in range(start_x, end_x):
 		var ground_y: int = get_ground_y_at(x)
 		if ground_y == -1:
-			continue  # no floor here, try next column
+			continue
 
-		var roof_y: int = get_roof_y_at(x)  # underside of the roof
-		# If there is a roof, make sure we have enough space:
-		# spawn will be at ground_y - 3, so we need spawn_y > roof_y
-		# -> ground_y - 3 > roof_y  => ground_y - roof_y >= 4
+		var roof_y: int = get_roof_y_at(x)
+		
 		if roof_y != -1:
 			if ground_y - roof_y < 4:
-				continue  # not enough vertical space, try next column
+				continue
 
-		# Place player 3 tiles above the floor
+		
 		var spawn_cell := Vector2i(x, ground_y)
 		var local := ground_tilemap.map_to_local(spawn_cell)
 		var global := ground_tilemap.to_global(local)
@@ -608,11 +548,9 @@ func get_player_spawn_position() -> Vector2:
 		
 		return global
 
-	# Fallback if no column was valid
 	return Vector2.ZERO
 
 
-# Evenly spaced enemy spawn positions on ground (world coords)
 func get_enemy_spawn_positions(count: int) -> Array[Vector2]:
 	var result: Array[Vector2] = []
 	if count <= 0:
@@ -620,14 +558,13 @@ func get_enemy_spawn_positions(count: int) -> Array[Vector2]:
 	if ground_tilemap == null or ground_tilemap.tile_set == null:
 		return result
 
-	# Reuse the same safe columns logic as player (floor + roof clearance)
+
 	var cols := _get_safe_spawn_columns()
 	if cols.is_empty():
 		return result
 
 	var n: int = min(count, cols.size())
 	for i in range(n):
-		# Evenly spread enemies across the safe columns
 		var t: float = float(i + 1) / float(n + 1)
 		var idx: int = int(t * float(cols.size()))
 		if idx < 0:
@@ -640,12 +577,10 @@ func get_enemy_spawn_positions(count: int) -> Array[Vector2]:
 		if ground_y == -1:
 			continue
 
-		# Use the SAME vertical formula as the player spawn:
-		# tile at (x, ground_y), then pixel-offset up to sit on the floor
 		var spawn_cell := Vector2i(x, ground_y)
 		var local := ground_tilemap.map_to_local(spawn_cell)
 		var global := ground_tilemap.to_global(local)
-		global.y -= (16 * 2) + 4  # same as get_player_spawn_position
+		global.y -= (16 * 2) + 4
 
 		result.append(global)
 

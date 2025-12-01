@@ -81,7 +81,6 @@ func _ready() -> void:
 	credits_button.focus_mode = Control.FOCUS_NONE
 	exit_button.focus_mode = Control.FOCUS_NONE
 
-	# Start with main menu visible, credits hidden
 	main_menu_content.visible = true
 	if credits:
 		credits.visible = false
@@ -95,8 +94,6 @@ func start_game() -> void:
 	lifebar.visible = true
 
 func _on_start_button_pressed() -> void:
-	print("start")
-	# Hide main menu & credits, unpause game
 	main_menu_content.visible = false
 	if credits:
 		credits.visible = false
@@ -108,20 +105,16 @@ func _on_credits_button_pressed() -> void:
 	if credits == null:
 		return
 
-	# Toggle between main menu and credits
+	
 	if credits.visible:
-		# Go back to main menu
 		credits.visible = false
 		main_menu_content.visible = true
 	else:
-		# Show credits, hide main menu buttons
 		credits.visible = true
 		main_menu_content.visible = false
 
 
 func _on_exit_button_pressed() -> void:
-	# On desktop this quits the game.
-	# On web it just stops the Godot instance.
 	get_tree().quit()
 
 

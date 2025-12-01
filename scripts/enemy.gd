@@ -42,9 +42,8 @@ const JUMP_VELOCITY := -150.0
 @export var crush_escape_cooldown: float = 0.6
 @export var crush_horizontal_boost: float = 80.0
 
-# NEW: limits for engaging / shooting
-@export var max_move_distance: float = 400.0   # beyond this, enemy won't chase
-@export var max_shoot_distance: float = 500.0  # beyond this, enemy won't shoot
+@export var max_move_distance: float = 400.0
+@export var max_shoot_distance: float = 500.0
 
 var _crush_timer: float = 0.0
 
@@ -69,7 +68,6 @@ func _randomize() -> void:
 	move_to_player = false
 	keep_distance_player = false
 
-	# Base movement stats
 	move_speed = base_speed + randf_range(-speed_variation, speed_variation)
 	if move_speed < 10.0:
 		move_speed = 10.0
@@ -79,13 +77,11 @@ func _randomize() -> void:
 		preferred_distance = 10.0
 
 	if is_boss:
-		# Boss: wants to stay in melee range, not on top of the player
 		move_to_player = true
 		preferred_distance = max(attack_range * 0.8, 16.0)
 		preferred_distance_tolerance = 8.0
 		return
 
-	# Normal enemies: random behavior
 	var mode: int = randi() % 2
 	match mode:
 		0:
@@ -121,18 +117,15 @@ func death() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	# If dying, just let physics continue (knockback + gravity), but no AI/attacks
 	if is_dying:
 		if not is_flying and not is_on_floor():
 			velocity.y += gravity * delta
 		move_and_slide()
 		return
 		
-	# Cooldown for crush escape
 	if _crush_timer > 0.0:
 		_crush_timer -= delta
 
-	# Apply gravity unless flying
 	if not is_flying:
 		if not is_on_floor():
 			velocity.y += gravity * delta
@@ -141,7 +134,6 @@ func _physics_process(delta: float) -> void:
 
 	var direction: float = _get_ai_direction()
 
-	# Horizontal movement
 	if not attacking:
 		if direction != 0.0:
 			velocity.x = direction * move_speed
@@ -159,7 +151,6 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-	# --- ANIMATION STATE ---
 	if is_flying:
 		if abs(velocity.x) > 10.0:
 			anim_sprite.play("walk")
@@ -198,13 +189,10 @@ func _handle_crush_escape() -> void:
 
 	var dx: float = player.global_position.x - global_position.x
 	var dy: float = player.global_position.y - global_position.y
-	# dy > 0 => enemy is ABOVE player
 
 	if abs(dx) <= crush_horizontal_threshold \
 		and dy > 0.0 and dy <= crush_vertical_threshold \
 		and is_on_floor():
-
-		print("Enemy above player → escape jump!")
 
 		var sign: float = -1.0
 		if randf() < 0.5:
@@ -224,7 +212,6 @@ func _get_ai_direction() -> float:
 	var dx: float = player.global_position.x - global_position.x
 	var dist: float = abs(dx)
 
-	# NEW: if too far, don't bother moving towards the player
 	if max_move_distance > 0.0 and dist > max_move_distance:
 		return 0.0
 
@@ -239,19 +226,17 @@ func _get_ai_direction() -> float:
 	var tolerance: float = preferred_distance_tolerance
 
 	if move_to_player:
-		# Melee style: stay close, but not overlapping
 		if dist < target_distance - tolerance:
-			dir = -sign_x  # too close → step back
+			dir = -sign_x
 		elif dist > target_distance + tolerance:
-			dir = sign_x   # too far → move in
+			dir = sign_x
 		else:
-			dir = 0.0      # good distance
+			dir = 0.0
 	elif keep_distance_player:
-		# Ranged style: same idea, but with larger preferred_distance
 		if dist < target_distance - tolerance:
-			dir = -sign_x  # too close → back away
+			dir = -sign_x
 		elif dist > target_distance + tolerance:
-			dir = sign_x   # too far → approach a bit
+			dir = sign_x
 		else:
 			dir = 0.0
 
@@ -275,7 +260,6 @@ func _handle_spawn_projectile(delta: float) -> void:
 	var dx: float = player.global_position.x - global_position.x
 	var dist: float = abs(dx)
 
-	# NEW: don't shoot if player is too far
 	if max_shoot_distance > 0.0 and dist > max_shoot_distance:
 		_reset_projectile_timer()
 		return
@@ -344,24 +328,22 @@ func on_hit(hit_position: Vector2) -> void:
 	if is_dying:
 		return
 
-	# --- KNOCKBACK (fling back) ---
+	# --- KNOCKBACK ---
 	var dir := (global_position - hit_position).normalized()
 	if dir == Vector2.ZERO:
 		dir = Vector2.RIGHT
 
-	# Horizontal knockback
 	velocity.x = dir.x * knockback_force
 
-	# Small hop for ground enemies
+	
 	if not is_flying and is_on_floor():
 		velocity.y = JUMP_VELOCITY * 0.4
 
 	# --- HIT FLASH ---
 	if anim_sprite:
-		# Immediately change color
+		
 		anim_sprite.modulate = hit_flash_color
 
-		# Tween back to white
 		var tween := create_tween()
 		tween.tween_property(
 			anim_sprite,
@@ -381,9 +363,5 @@ func on_hit(hit_position: Vector2) -> void:
 		
 		anim_sprite.play("death")
 
-		# Optional: extra knockback on death
-		# velocity.y = JUMP_VELOCITY * 0.6
-
-		# Schedule actual removal
 		var timer := get_tree().create_timer(1.0)
 		timer.timeout.connect(death)

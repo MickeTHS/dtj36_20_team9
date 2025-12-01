@@ -22,17 +22,12 @@ func _ready() -> void:
 	sprite.play()
 
 func _process(delta: float) -> void:
-	# Move in the chosen direction
 	position += direction * speed * delta
 
-		
-	# Auto-despawn after lifetime
 	_life_timer -= delta
 	if _life_timer <= 0.0:
 		queue_free()
 
-
-# Optional if you want collision behavior
 func _on_area_entered(area: Area2D) -> void:
 	pass
 
